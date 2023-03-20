@@ -1,0 +1,16 @@
+{
+	"files.associations": {
+		"iostream": "cpp",
+		"vector": "cpp",
+		"iosfwd": "cpp",
+		"iterator": "cpp",
+		"map": "cpp",
+		"__hash_table": "cpp",
+		"__node_handle": "cpp",
+		"__tree": "cpp",
+		"functional": "cpp",
+		"unordered_map": "cpp",
+		"istream": "cpp",
+		"chrono": "cpp"
+	}
+}
