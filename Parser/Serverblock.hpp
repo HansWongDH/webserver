@@ -4,6 +4,7 @@
 # include <map>
 # include <iostream>
 # include <vector>
+# include "locationBlock.hpp"
 
 using std::multimap;
 using std::map;
@@ -16,7 +17,8 @@ namespace ft{
 		typedef string							key_type;
 		typedef vector<string>					value_type;
 		typedef map<string, value_type >		config_type;
-		typedef	multimap<string, value_type >	location_type;
+		typedef	ft::locationBlock				location_class;
+		typedef	multimap<string, config_type>		location_type;
 		
 
 		void	addConfig(key_type key, value_type value)
@@ -24,9 +26,21 @@ namespace ft{
 			config.insert(std::make_pair(key, value));
 		}
 
-		void	addLocation(key_type key, value_type value)
+		void	insertConfig(const config_type& other)
 		{
-			location.insert(std::make_pair(key, value));
+			this->config = other;
+		}
+
+		config_type	createConfig(key_type key, value_type value)
+		{
+			config_type tmp;
+			tmp.insert(std::make_pair(key, value));
+			return tmp;
+		}
+
+		void	addLocation(key_type key, config_type config)
+		{
+			location.insert(std::make_pair(key, config));
 		}
 
 		location_type	getLocation(void) const
@@ -34,7 +48,38 @@ namespace ft{
 			return this->location;
 		}
 		
-		config_type	getConfig(void) const
+		void	printConfig(void)
+		{
+			printing(this->config);
+		}
+		void	printing(config_type& con)
+		{
+			config_type::iterator it = con.begin();
+			for (; it != con.end(); it++)
+			{ 
+				std::cout<< "key = " << it->first << std::endl;
+				for (value_type::iterator vt = it->second.begin(); vt != it->second.end(); vt++)
+					std::cout<< "value = " << *vt << std::endl;
+			}
+		}
+
+		location_type	getLocation(void)
+		{
+			return this->location;
+		}
+
+		void	printLocation()
+		{
+			location_type::iterator it = location.begin();
+			for (; it != location.end(); it++)
+			{
+				std::cout <<"map key === " << it->first << " map value === " <<  std::endl;
+				printing(it->second);
+			}
+
+		}
+
+		config_type	getConfig(void)
 		{
 			return this->config;
 		}
