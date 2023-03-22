@@ -66,6 +66,11 @@ namespace ft{
 			return this->location;
 		}
 
+		void	clear()
+		{
+			config.clear();
+			location.clear();
+		}
 		void	printLocation()
 		{
 			location_type::iterator it = location.begin();
