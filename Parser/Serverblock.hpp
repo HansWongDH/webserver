@@ -4,7 +4,6 @@
 # include <map>
 # include <iostream>
 # include <vector>
-# include "locationBlock.hpp"
 
 using std::multimap;
 using std::map;
@@ -17,7 +16,6 @@ namespace ft{
 		typedef string							key_type;
 		typedef vector<string>					value_type;
 		typedef map<string, value_type >		config_type;
-		typedef	ft::locationBlock				location_class;
 		typedef	multimap<string, config_type>		location_type;
 		
 
@@ -73,7 +71,7 @@ namespace ft{
 			location_type::iterator it = location.begin();
 			for (; it != location.end(); it++)
 			{
-				std::cout <<"map key === " << it->first << " map value === " <<  std::endl;
+				std::cout <<"map key === " << it->first << " | map value |" <<  std::endl;
 				printing(it->second);
 			}
 

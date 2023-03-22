@@ -56,7 +56,6 @@ namespace 	ft{
 				return 0;
 			}
 			
-
 			void	readfile(ifstream &file)
 			{
 				string	tmp;
@@ -77,42 +76,35 @@ namespace 	ft{
 			
 			void	searchServer(ifstream& file, value_type& store)
 			{
-				store.insertConfig(searchConfig(file, store, this->info));
-			}
-			config_type	searchConfig(ifstream& file, value_type& store, key_type search)
-			{
 				string tmp;
 				string key;
 				string value;
 				vector<string> block;
-				config_type	config;
 				while (getline(file, tmp))
 				{
-					std::cout<< "temp === " << tmp << std::endl;
+					// std::cout<< "temp === " << tmp << std::endl;
 					stringstream ss2(tmp);
 					ss2 >> key;
 					if (!key.compare("}"))
-							break ;
+						break ;
 					if (!key.compare("location"))
 					{
-				
 						ss2 >> value;
-								std::cout << "key ===" << value << std::endl;
 						searchLocation(file, store, value);
+						value.clear();
 					}
-					for (key_iterator it = search.begin(); it != search.end(); it++)
+					for (key_iterator it = info.begin(); it != info.end(); it++)
 					{
 						if(!key.compare(*it))
 						{
 							while (ss2 >> value)
 								block.push_back(value);
-							config.insert(std::make_pair(key, block));
+							store.addConfig(key, block);
 							block.clear();
 						}
 					}
-				
+					key.clear();
 				}
-				return config;
 			}
 
 			void	searchLocation(ifstream& file, value_type& store, string map_key)
@@ -122,10 +114,10 @@ namespace 	ft{
 				string	value;
 				vector<string> block;
 				config_type	config;
-				static int 	i = 0;
+
 				while(getline(file, tmp))
 				{
-					// std::cout << "tmp is === " << tmp << std::endl;
+					// std::cout << "location tmp is === " << tmp << std::endl;
 					stringstream ss(tmp);
 					ss >> key;
 					if (!key.compare("}"))
@@ -138,25 +130,15 @@ namespace 	ft{
 					}
 					config.insert(std::make_pair(key, block));
 					block.clear();
+					key.clear();
 				}
 				store.addLocation(map_key, config);
-				i++;
 			}
 
 			server_type	getServer()
 			{
 				return this->server;
 			}
-			// void	addServerblock(string key,	value_type value)
-			// {
-			// 	server_info.insert(std::make_pair(key, value));
-			// }
-			// std::pair<iterator, iterator>	getServer(const string& key)
-			// {
-			// 	return server_info.equal_range(key);
-			// }
-
-
 	};
 }
 #endif
