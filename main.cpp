@@ -10,8 +10,8 @@ int	main(void)
 	file.open("./config/example.conf");
 	const char* temp[]	= {"listen", "server_name", "root"};
 	std::vector<std::string> test (temp, temp + 3);
-	ft::Parser lol(test);
-	lol.readfile(file);
+	ft::Parser lol(file, test);
+	// lol.readfile(file);
 
 	vector<ft::ServerBlock> vet;
 	vet = lol.getServer();

@@ -17,6 +17,8 @@ namespace ft{
 		typedef vector<string>					value_type;
 		typedef map<string, value_type >		config_type;
 		typedef	multimap<string, config_type>		location_type;
+		typedef	config_type::iterator				config_iterator;
+		typedef	location_type::iterator				location_iterator;
 		
 
 		void	addConfig(key_type key, value_type value)
@@ -61,6 +63,16 @@ namespace ft{
 			}
 		}
 
+		value_type	getinfo(const key_type& key)
+		{
+			config_type::iterator it;
+
+			it = config.find(key);
+			if (it == config.end())
+				throw std::out_of_range("Key not found");
+			return it->second;
+		}
+
 		location_type	getLocation(void)
 		{
 			return this->location;
@@ -81,6 +93,23 @@ namespace ft{
 			}
 
 		}
+
+		void	updateConfig(config_type con)
+		{
+			this->config = con;
+		}
+
+
+		// void	updateConfigz(config_type ori, config_type update)
+		// {
+		// 	ori = update;
+		// }
+
+		// void	updateLocation(location_type loc)
+		// {
+		// 	this->location = loc;
+		// 	for (location_iterator it = loc.begin(); it != loc.end(); it++)
+		// }
 
 		config_type	getConfig(void)
 		{
