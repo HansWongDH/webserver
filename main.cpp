@@ -17,8 +17,10 @@ int	main(void)
 	vet = lol.getServer();
 	for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
 	{
-		// it->printConfig();
+		it->printConfig();
+		std::cout << "---------------------------" << std::endl;
 		it->printLocation();
+		std::cout << "===========================" << std::endl;
 	}
 
 }

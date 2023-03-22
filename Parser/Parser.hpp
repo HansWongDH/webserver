@@ -70,6 +70,7 @@ namespace 	ft{
 					{
 						searchServer(file, store);
 						this->server.push_back(store);
+						store.clear();
 					}
 				}
 			}
