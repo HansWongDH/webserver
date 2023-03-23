@@ -98,7 +98,9 @@ namespace ft
 				int client_fd;
 				socklen_t addr_len = sizeof(address);
 
+				std::cout << "it->getPortNo() 1" << std::endl;
 				client_fd = accept(socket_fd, (struct sockaddr *)&address, &addr_len);
+				std::cout << "it->getPortNo() 2" << std::endl;
 
 				if (client_fd < 0)
 					throw std::runtime_error("Failed to accept connection");

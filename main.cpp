@@ -5,6 +5,22 @@
 #include <poll.h>
 #include "./Server/Server.hpp"
 
+
+// void run(ft::Server	server)
+// {
+// 	const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 18\n\nChicken pie world!";
+
+// 	printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+	
+
+// 	printf("Accepted\n");
+// 	char buffer[30000] = {0};
+// 	read(server.getFd() , buffer, 30000);
+// 	printf("%s\n",buffer );
+// 	write(server.getFd() , hello , strlen(hello));
+// 	printf("------------------Hello message sent-------------------\n");
+// }
+
 int	main(void)
 {
 	std::ifstream file;
@@ -27,15 +43,22 @@ int	main(void)
 
 	std::vector<ft::Server> servers;
 
+	typedef std::vector<ft::Server> serverblob;
 	for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
 	{
 		// Initialize server
 		ft::Server server = ft::Server(it->getPortNo());
-
+		std::cout << it->getPortNo() << std::endl;
 		servers.push_back(server);
-
-		server.run(); // Currently blocking, but the next one will crash
 	}
+
+	// while (1)
+	// {
+	// 	for (serverblob::iterator it = servers.begin(); it != servers.end(); it++)
+	// 		run(*it);
+	// }
+
+
 
 	// Need to do a while loop like this, but poll must be inside if not it cannot accept anything
 	// while(1)

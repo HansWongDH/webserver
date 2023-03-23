@@ -3,6 +3,7 @@
 
 # include <unistd.h>
 # include "Socket.hpp"
+# include "Client.hpp"
 
 namespace ft
 {
@@ -10,35 +11,28 @@ namespace ft
     {
         public:
             Server() {}
-            Server(int port): socket(port) {}
+            Server(int port): socket(port), port(port) {
+
+            }
             
             ~Server() {
-                close(client_fd);
+                // close(client_fd);
             }
 
             /**
              * @brief Keep waiting for a connection
              * 
              */
-            void run()
-            {
-                const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 18\n\nChicken pie world!";
-
-                printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-                client_fd = socket.accept_connection();
-
-                printf("Accepted\n");
-                char buffer[30000] = {0};
-                read(client_fd , buffer, 30000);
-                printf("%s\n",buffer );
-                write(client_fd , hello , strlen(hello));
-                printf("------------------Hello message sent-------------------\n");
-                close(client_fd);
-            }
+            
+            // int getFd(void)
+            // {
+            //     return client_fd;
+            // }
 
         private:
             ft::Socket socket;
-            int client_fd;
+            int port;
+            std::map<int, ft::Client> m_client;
     };
 }
 
