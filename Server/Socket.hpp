@@ -103,16 +103,16 @@ namespace ft
 				if (client_fd < 0)
 					throw std::runtime_error("Failed to accept connection");
 
-				// int flags = fcntl(client_fd, F_GETFL, 0);
-				// if (flags < 0)
-				// {
-				// 	throw std::runtime_error("Failed to get client socket flags");
-				// }
+				int flags = fcntl(client_fd, F_GETFL, 0);
+				if (flags < 0)
+				{
+					throw std::runtime_error("Failed to get client socket flags");
+				}
 
-				// if (fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) < 0)
-				// {
-				// 	throw std::runtime_error("Failed to set socket to non-blocking mode");
-				// }
+				if (fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) < 0)
+				{
+					throw std::runtime_error("Failed to set socket to non-blocking mode");
+				}
 
 				return client_fd;
 			}
