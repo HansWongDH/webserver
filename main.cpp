@@ -29,17 +29,17 @@ int	main(void)
 	const char* temp[]	= {"listen", "server_name", "root"};
 	std::vector<std::string> test (temp, temp + 3);
 	ft::Parser lol(file, test);
-	// lol.readfile(file);
+	struct pollfd fds[200];
 
 	std::vector<ft::ServerBlock> vet;
-	vet = lol.getServerInfo();
-	// for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
-	// {
-	// 	it->printConfig();
-	// 	std::cout << "---------------------------" << std::endl;
-	// 	it->printLocation();
-	// 	std::cout << "===========================" << std::endl;
-	// }
+	// vet = lol.getServerInfo();
+	// // for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
+	// // {
+	// // 	it->printConfig();
+	// // 	std::cout << "---------------------------" << std::endl;
+	// // 	it->printLocation();
+	// // 	std::cout << "===========================" << std::endl;
+	// // }
 
 	std::vector<ft::Server> servers;
 
@@ -48,8 +48,30 @@ int	main(void)
 	{
 		// Initialize server
 		ft::Server server = ft::Server(it->getPortNo());
-		std::cout << it->getPortNo() << std::endl;
 		servers.push_back(server);
+	}
+
+	for (int i = 0; i < servers.size(); i++)
+	{
+		fds[i].fd = servers[i].getSocket().getSocketfd();
+		int poll_length = 1;
+		if (poll(fds, poll_length, 100))
+		{
+
+		int	x = 0;
+		while (x < poll_length)
+		{
+			if (fds[x].fd)
+			{
+				servers[i].bind_fd(servers[i].getSocket().accept_connection());
+				fds[poll_length + 1].fd = servers[i].getFd();
+				fds[poll_length + 1].events = POLLIN;
+			}
+			else
+				return;
+		}
+	}
+
 	}
 
 	// while (1)
