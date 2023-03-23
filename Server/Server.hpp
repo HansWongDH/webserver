@@ -10,6 +10,7 @@ namespace ft
     {
         public:
             Server() {}
+            Server(int port): socket(port) {}
             
             ~Server() {
                 close(client_fd);
