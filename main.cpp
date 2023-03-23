@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "./Server/Server.hpp"
 
 int	main(void)
 {
@@ -23,4 +24,9 @@ int	main(void)
 		std::cout << "===========================" << std::endl;
 	}
 
+	// Initialize server
+	ft::Server server;
+
+	// Run and await connections
+	server.run();
 }
