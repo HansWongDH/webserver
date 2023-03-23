@@ -145,13 +145,13 @@ namespace 	ft{
 				store.addLocation(map_key, config);
 			}
 
-			server_type	getServer()
+			server_type	getServerInfo()
 			{
 				return this->server;
 			}
 			void	checkPort(value_type config)
 			{
-				key_type port = config.getinfo("listen");
+				key_type port = config.getConfigInfo("listen");
 				if (port.size() < 1)
 					throw std::out_of_range("Listen port not initalized");
 				if (port.size() != 1)
@@ -174,17 +174,27 @@ namespace 	ft{
 						if (text.back() != ';')
 							throw std::invalid_argument("end of line missing : ';'");
 						else
-						{
 							config.back().pop_back();
-						}
 					}
 				}
 			}
+			
+			void	locationChecking(value_type server)
+			{
+				key_type vec = server.getLocationKey();
+				for (key_iterator it = vec.begin(); it != vec.end(); it++)
+				{
+					if (it->front() != '/')
+						throw std::invalid_argument("invalid location");
+				}
+			}
+
 			void	errorChecking(void)
 			{
 				for (iterator it = server.begin(); it != server.end(); it++)
 				{
 					checkPort(*it);
+					locationChecking(*it);
 				}
 			}
 

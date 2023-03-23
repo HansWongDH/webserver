@@ -14,7 +14,7 @@ int	main(void)
 	// lol.readfile(file);
 
 	vector<ft::ServerBlock> vet;
-	vet = lol.getServer();
+	vet = lol.getServerInfo();
 	for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
 	{
 		it->printConfig();
