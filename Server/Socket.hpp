@@ -9,7 +9,9 @@ namespace ft
 {
 	class Socket {
 		public:
-			~Socket() {}
+			~Socket() {
+				close(socket_fd);
+			}
 
 			/**
 			 * @brief Construct a new Socket object
@@ -29,19 +31,28 @@ namespace ft
 				int port = 3000;
 				int interface = INADDR_ANY;
 
-				address.sin_family = domain;
-				address.sin_port = htons(port);
-				address.sin_addr.s_addr = htonl(interface);
-				memset(address.sin_zero, '\0', sizeof address.sin_zero);
+				setup(domain, service, protocol, port, interface, backlog);
+			}
 
-				if ((socket_fd = socket(domain, service, protocol)) < 0)
-					throw std::runtime_error("Failed to create socket");
+			/**
+			 * @brief Construct a new Socket object
+			 * 
+			 * @param port Port to listen on
+			 * @param backlog Optional. Defaults to 20
+			 */
+			Socket(int port, int backlog = 20)
+			{
+				/**
+				 * @brief defining address structure
+				 * The htons() function translates a short integer from host byte order to network byte order. 
+				 * The htonl() function translates a long integer from host byte order to network byte order.
+				 */
+				int domain = AF_INET;
+				int service = SOCK_STREAM;
+				int protocol = 0;
+				int interface = INADDR_ANY;
 
-				if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-					throw std::runtime_error("Failed to bind socket");
-
-				if (listen(socket_fd, backlog) < 0)
-					throw std::runtime_error("Failed to listen on socket");
+				setup(domain, service, protocol, port, interface, backlog);
 			}
 			
 			/**
@@ -57,24 +68,7 @@ namespace ft
 			 */
 			Socket(int domain, int service, int protocol, int port, u_long interface, int backlog = 20)
 			{
-				/**
-				 * @brief defining address structure
-				 * The htons() function translates a short integer from host byte order to network byte order. 
-				 * The htonl() function translates a long integer from host byte order to network byte order.
-				 */
-				address.sin_family = domain;
-				address.sin_port = htons(port);
-				address.sin_addr.s_addr = htonl(interface);
-				memset(address.sin_zero, '\0', sizeof address.sin_zero);
-
-				if ((socket_fd = socket(domain, service, protocol)) < 0)
-					throw std::runtime_error("Failed to create socket");
-
-				if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-					throw std::runtime_error("Failed to bind socket");
-
-				if (listen(socket_fd, backlog) < 0)
-					throw std::runtime_error("Failed to listen on socket");
+				setup(domain, service, protocol, port, interface, backlog);
 			}
 
 			/* Getter*/
@@ -114,6 +108,50 @@ namespace ft
 			int	socket_fd;
 			int connection;
 			struct sockaddr_in	address;
+
+			void setup(int domain, int service, int protocol, int port, u_long interface, int backlog)
+			{
+				/**
+				 * @brief defining address structure
+				 * The htons() function translates a short integer from host byte order to network byte order. 
+				 * The htonl() function translates a long integer from host byte order to network byte order.
+				 */
+				address.sin_family = domain;
+				address.sin_port = htons(port);
+				address.sin_addr.s_addr = htonl(interface);
+				memset(address.sin_zero, '\0', sizeof address.sin_zero);
+
+				std::cout << "\033[96m[INFO]	Initializing server..." << std::endl;
+
+				if ((socket_fd = socket(domain, service, protocol)) < 0)
+				{
+					std::cerr << "\033[31m[ERROR]	\033[96msocket:	\033[0m" << strerror(errno) << std::endl;
+					throw std::runtime_error("Failed to create socket");
+				}
+
+				std::cout << "\033[96m[INFO]	FD: " << socket_fd << std::endl;
+
+				int opt = 1;
+				if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+				{
+					std::cerr << "\033[31m[ERROR]	\033[96msetsockopt:	\033[0m" << strerror(errno) << std::endl;
+    				throw std::runtime_error("Failed to set socket options");
+				}
+
+				if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+				{
+					std::cerr << "\033[31m[ERROR]	\033[96mbind:	\033[0m" << strerror(errno) << std::endl;
+					throw std::runtime_error("Failed to bind socket");
+				}
+
+				if (listen(socket_fd, backlog) < 0)
+				{
+					std::cerr << "\033[31m[ERROR]	\033[96mlisten:	\033[0m" << strerror(errno) << std::endl;
+					throw std::runtime_error("Failed to listen on socket");
+				}
+
+				std::cout << "\033[92m[ OK ]	Ready! Listening on port " << port << "\033[0m" << std::endl;
+			}
 	};
 } // namespace ft
 

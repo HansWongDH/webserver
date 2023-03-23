@@ -10,7 +10,11 @@ namespace ft
     {
         public:
             Server() {}
-            ~Server() {}
+            Server(int port): socket(port) {}
+            
+            ~Server() {
+                close(client_fd);
+            }
             Server(const Server &copy);
             Server &operator=(const Server &copy);
 
@@ -20,24 +24,25 @@ namespace ft
              */
             void run()
             {
-                const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+                const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 18\n\nChicken pie world!";
 
                 while(1)
                 {
                     printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-                    int new_socket = socket.accept_connection();
+                    client_fd = socket.accept_connection();
                     
                     char buffer[30000] = {0};
-                    read(new_socket , buffer, 30000);
+                    read(client_fd , buffer, 30000);
                     printf("%s\n",buffer );
-                    write(new_socket , hello , strlen(hello));
+                    write(client_fd , hello , strlen(hello));
                     printf("------------------Hello message sent-------------------\n");
-                    close(new_socket);
+                    close(client_fd);
                 }
             }
 
         private:
             ft::Socket socket;
+            int client_fd;
     };
 }
 

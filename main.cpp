@@ -14,19 +14,27 @@ int	main(void)
 	ft::Parser lol(file, test);
 	// lol.readfile(file);
 
-	vector<ft::ServerBlock> vet;
+	std::vector<ft::ServerBlock> vet;
 	vet = lol.getServerInfo();
+	// for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
+	// {
+	// 	it->printConfig();
+	// 	std::cout << "---------------------------" << std::endl;
+	// 	it->printLocation();
+	// 	std::cout << "===========================" << std::endl;
+	// }
+
+	std::vector<ft::Server> servers;
+
 	for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
 	{
-		it->printConfig();
-		std::cout << "---------------------------" << std::endl;
-		it->printLocation();
-		std::cout << "===========================" << std::endl;
+		// Initialize server
+		ft::Server server = ft::Server(it->getPortNo());
+
+		servers.push_back(server);
+
+		// Run and await connections
+		// server.run();
 	}
 
-	// Initialize server
-	ft::Server server;
-
-	// Run and await connections
-	server.run();
 }
