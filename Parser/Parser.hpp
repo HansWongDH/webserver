@@ -171,30 +171,30 @@ namespace 	ft{
 					if (!text.empty())
 					{
 						// std::cout << " STRING IS === " << text << std::endl;
-						if (text.back() != ';')
-							throw std::invalid_argument("end of line missing : ';'");
-						else
+						// if (text.back() != ';')
+						// 	throw std::invalid_argument("end of line missing : ';'");
+						// else
 							config.back().pop_back();
 					}
 				}
 			}
 			
-			void	locationChecking(value_type server)
-			{
-				key_type vec = server.getLocationKey();
-				for (key_iterator it = vec.begin(); it != vec.end(); it++)
-				{
-					if (it->front() != '/')
-						throw std::invalid_argument("invalid location");
-				}
-			}
+			// void	locationChecking(value_type server)
+			// {
+			// 	key_type vec = server.getLocationKey();
+			// 	for (key_iterator it = vec.begin(); it != vec.end(); it++)
+			// 	{
+			// 		if (it->front() != '/')
+			// 			throw std::invalid_argument("invalid location");
+			// 	}
+			// }
 
 			void	errorChecking(void)
 			{
 				for (iterator it = server.begin(); it != server.end(); it++)
 				{
 					checkPort(*it);
-					locationChecking(*it);
+					// locationChecking(*it);
 				}
 			}
 

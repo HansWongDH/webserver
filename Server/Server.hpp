@@ -3,6 +3,7 @@
 
 # include <unistd.h>
 # include "Socket.hpp"
+# include "../Parser/Serverblock.hpp"
 
 namespace ft
 {
@@ -10,12 +11,12 @@ namespace ft
     {
         public:
             Server() {}
-            Server(int port): socket(port) {
+            Server(int port, ft::ServerBlock serv): socket(port), server(serv) {
                 // client_fd = socket.accept_connection();
             }
             
             ~Server() {
-                close(client_fd);
+                // close(client_fd);
             }
 
             /**
@@ -23,24 +24,25 @@ namespace ft
              * 
              */
             
-            int getFd(void)
-            {
-                return client_fd;
-            }
+            // int getFd(void)
+            // {
+            //     return client_fd;
+            // }
 
             ft::Socket getSocket(void)
             {
                 return this->socket;
             }
 
-            void    bind_fd(int fd)
-            {
-                client_fd = fd;
-            }
+            // void    bind_fd(int fd)
+            // {
+            //     client_fd = fd;
+            // }
 
         private:
+            ft::ServerBlock server;
             ft::Socket socket;
-            int client_fd;
+            std::vector<int> fd;
     };
 }
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <poll.h>
 #include "./Server/Server.hpp"
+#include "./Server/Socket.hpp"
 
 
 // void run(ft::Server	server)
@@ -29,50 +30,131 @@ int	main(void)
 	const char* temp[]	= {"listen", "server_name", "root"};
 	std::vector<std::string> test (temp, temp + 3);
 	ft::Parser lol(file, test);
-	struct pollfd fds[200];
+	std::vector<struct pollfd> fds;
 
 	std::vector<ft::ServerBlock> vet;
-	// vet = lol.getServerInfo();
-	// // for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
-	// // {
-	// // 	it->printConfig();
-	// // 	std::cout << "---------------------------" << std::endl;
-	// // 	it->printLocation();
-	// // 	std::cout << "===========================" << std::endl;
-	// // }
+	std::vector<ft::Server> Servers;
+	vet = lol.getServerInfo();
 
-	std::vector<ft::Server> servers;
-
-	typedef std::vector<ft::Server> serverblob;
+	
 	for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
 	{
-		// Initialize server
-		ft::Server server = ft::Server(it->getPortNo());
-		servers.push_back(server);
+		ft::Server server = ft::Server(it->getPortNo(), *it);
+		Servers.push_back(server);
+		
+		// it->printConfig();
+		// std::cout << "---------------------------" << std::endl;
+		// it->printLocation();
+		// std::cout << "===========================" << std::endl;
+			// std::cout << "current i is " << i << std::endl;	
 	}
 
-	for (int i = 0; i < servers.size(); i++)
-	{
-		fds[i].fd = servers[i].getSocket().getSocketfd();
-		int poll_length = 1;
-		if (poll(fds, poll_length, 100))
-		{
 
-		int	x = 0;
-		while (x < poll_length)
+
+	for (std::vector<ft::Server>::iterator it = Servers.begin(); it != Servers.end(); it++)
+	{
+		struct pollfd tmp;
+		tmp.fd = it->getSocket().getSocketfd();
+		tmp.events = POLLIN;
+		fds.push_back(tmp);
+
+		
+	}
+
+	// for (std::vector<ft::Server>::iterator it = Servers.begin(); it != Servers.end(); it++)
+	// {
+		
+	//  	std::cout << "my fd is === "<< it->getSocket().getSocketfd() << std::endl;
+	
+
+		
+	// }
+
+	for (std::vector<struct pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
+	{
+		std::cout << "event is === " <<it->revents << std::endl;
+	}
+	// std::vector<ft::Server> servers;
+
+	// // typedef std::vector<ft::Server> serverblob;
+	// for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
+	// {
+	// 	// Initialize server
+	// 	ft::Server server = ft::Server(it->getPortNo());
+	// 	std::cout <<it->getPortNo() << std::endl;
+	// 	servers.push_back(server);
+	// }
+	// for (int i = 0; i < servers.size(); i++)
+	// {
+		
+	// 	fds[i].fd = servers[i].getSocket().getSocketfd();
+	// 	fds[i].events = POLLIN;
+	// }
+	char buf[3000];
+
+	// fds[0].fd = lol.getSocketfd();
+	// fds[0].events = POLLIN;
+	// int poll_length = 1;
+	// bool haha = false;
+	while (1)
+	{
+		int	server_size = Servers.size();
+		if (poll(fds.data(), fds.size(), 1000))
 		{
-			if (fds[x].fd)
+		
+			for(int i = 0; i < fds.size(); i++)
 			{
-				servers[i].bind_fd(servers[i].getSocket().accept_connection());
-				fds[poll_length + 1].fd = servers[i].getFd();
-				fds[poll_length + 1].events = POLLIN;
+					// std::cout << "event is === " <<fds[i].revents << std::endl;
+			if (i < server_size)
+			{
+				if(fds[i].revents == 0)
+        			continue;
+				if (fds[i].revents & POLLIN)
+				{
+					
+					struct pollfd tmp;
+					tmp.fd = Servers[i].getSocket().accept_connection();
+					tmp.events = POLLIN;
+					fds.push_back(tmp);
+				}
 			}
-			else
-				return;
+			else if (fds[i].revents != 0)
+				{
+					// if (fds[i].fd)
+					// {
+					// if (haha == true)
+					// 	{
+					// 		std::cout << "hajhahaahahahahah" << std::endl;
+					// 		fds[i].fd = -1;
+					// 		poll_length--;
+					// 		haha = false;
+					// 		break;
+					// 	}
+						if (fds[i].revents & POLLIN)
+						{
+							std::cout<< "connected" << std::endl;
+							read(fds[i].fd, buf, 3000);
+							if (buf)
+								fds[i].events = POLLOUT;
+						}
+						else if (fds[i].revents & POLLOUT)
+						{
+							std::cout << "SENDING" << std::endl;
+							write(fds[i].fd, "HAHAHAHAHAHAHAAHAH", 19);
+							fds[i].events = POLLIN;
+							// poll_length--;
+						}
+				
+					}
+					}
+				// }
+			
+			}
+
 		}
 	}
 
-	}
+
 
 	// while (1)
 	// {
@@ -96,4 +178,3 @@ int	main(void)
 	// 	}
 	// }
 
-}

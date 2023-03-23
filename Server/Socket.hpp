@@ -5,7 +5,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <fcntl.h>
-
+#include <cstring>
+#include <unistd.h>
 namespace ft
 {
 	class Socket {
@@ -98,9 +99,7 @@ namespace ft
 				int client_fd;
 				socklen_t addr_len = sizeof(address);
 
-				std::cout << "it->getPortNo() 1" << std::endl;
 				client_fd = accept(socket_fd, (struct sockaddr *)&address, &addr_len);
-				std::cout << "it->getPortNo() 2" << std::endl;
 
 				if (client_fd < 0)
 					throw std::runtime_error("Failed to accept connection");
@@ -140,7 +139,7 @@ namespace ft
 
 				if ((socket_fd = socket(domain, service, protocol)) < 0)
 				{
-					std::cerr << "\033[31m[ERROR]	\033[96msocket:	\033[0m" << strerror(errno) << std::endl;
+					// std::cerr << "\033[31m[ERROR]	\033[96msocket:	\033[0m" << strerror(errno) << std::endl;
 					throw std::runtime_error("Failed to create socket");
 				}
 
@@ -149,19 +148,19 @@ namespace ft
 				int opt = 1;
 				if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 				{
-					std::cerr << "\033[31m[ERROR]	\033[96msetsockopt:	\033[0m" << strerror(errno) << std::endl;
+					// std::cerr << "\033[31m[ERROR]	\033[96msetsockopt:	\033[0m" << strerror(errno) << std::endl;
     				throw std::runtime_error("Failed to set socket options");
 				}
 
 				if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 				{
-					std::cerr << "\033[31m[ERROR]	\033[96mbind:	\033[0m" << strerror(errno) << std::endl;
+					// std::cerr << "\033[31m[ERROR]	\033[96mbind:	\033[0m" << strerror(errno) << std::endl;
 					throw std::runtime_error("Failed to bind socket");
 				}
 
 				if (listen(socket_fd, backlog) < 0)
 				{
-					std::cerr << "\033[31m[ERROR]	\033[96mlisten:	\033[0m" << strerror(errno) << std::endl;
+					// std::cerr << "\033[31m[ERROR]	\033[96mlisten:	\033[0m" << strerror(errno) << std::endl;
 					throw std::runtime_error("Failed to listen on socket");
 				}
 

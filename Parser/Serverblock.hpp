@@ -4,6 +4,8 @@
 # include <map>
 # include <iostream>
 # include <vector>
+# include "../Server/Socket.hpp"
+
 #include <sstream>
 
 using std::multimap;
@@ -23,6 +25,20 @@ namespace ft{
 		typedef	location_type::iterator				location_iterator;
 		typedef value_type::iterator				iterator;
 		
+		ServerBlock()
+		{
+		
+		}
+		~ServerBlock()
+		{
+			
+		}
+
+		ServerBlock(const ServerBlock& other)
+		{
+			this->config = other.config;
+			this->location = other.location;
+		}
 
 		void	addConfig(key_type key, value_type value)
 		{
@@ -152,7 +168,7 @@ namespace ft{
 		private:
 			config_type		config;
 			location_type	location;
-	};
+	};	
 }
 
 #endif
