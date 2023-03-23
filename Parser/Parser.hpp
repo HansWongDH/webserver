@@ -15,7 +15,7 @@ using std::stringstream;
 namespace 	ft{
 	class Parser {
 		public:
-			typedef	vector<string>		key_type;
+			typedef	ft::ServerBlock::value_type key_type;;
 			typedef	key_type::iterator	key_iterator;
 			typedef ft::ServerBlock		value_type;
 			typedef ft::ServerBlock::config_type	config_type;
@@ -27,9 +27,10 @@ namespace 	ft{
 			server_type		server;
 		
 		public:
-			Parser(key_type key) : info(key)
+			Parser(ifstream &file, key_type key) : info(key)
 			{
-
+				readfile(file);
+				errorChecking();
 			}
 
 			~Parser()
@@ -68,10 +69,13 @@ namespace 	ft{
 					ss >> key >> value;
 					if (!key.compare("server") && !value.compare("{"))
 					{
+						// std::cout << "HERE " << std::endl;
 						searchServer(file, store);
 						this->server.push_back(store);
 						store.clear();
 					}
+					key.clear();
+					value.clear();
 				}
 			}
 			
@@ -80,10 +84,10 @@ namespace 	ft{
 				string tmp;
 				string key;
 				string value;
+				string bracket;
 				vector<string> block;
 				while (getline(file, tmp))
 				{
-					// std::cout<< "temp === " << tmp << std::endl;
 					stringstream ss2(tmp);
 					ss2 >> key;
 					if (!key.compare("}"))
@@ -91,8 +95,11 @@ namespace 	ft{
 					if (!key.compare("location"))
 					{
 						ss2 >> value;
-						searchLocation(file, store, value);
+						ss2 >> bracket;
+						if (!bracket.compare("{"))
+							searchLocation(file, store, value);
 						value.clear();
+						bracket.clear();
 					}
 					for (key_iterator it = info.begin(); it != info.end(); it++)
 					{
@@ -100,6 +107,7 @@ namespace 	ft{
 						{
 							while (ss2 >> value)
 								block.push_back(value);
+							endoflineCheck(block);
 							store.addConfig(key, block);
 							block.clear();
 						}
@@ -129,6 +137,7 @@ namespace 	ft{
 						// std::cout << "value === " << value << std::endl;
 						block.push_back(value);
 					}
+					endoflineCheck(block);
 					config.insert(std::make_pair(key, block));
 					block.clear();
 					key.clear();
@@ -136,10 +145,59 @@ namespace 	ft{
 				store.addLocation(map_key, config);
 			}
 
-			server_type	getServer()
+			server_type	getServerInfo()
 			{
 				return this->server;
 			}
+			void	checkPort(value_type config)
+			{
+				key_type port = config.getConfigInfo("listen");
+				if (port.size() < 1)
+					throw std::out_of_range("Listen port not initalized");
+				if (port.size() != 1)
+					throw std::out_of_range("Multiple listen port");
+				string test = *(port.begin());
+				// std::cout << "port text" << test << std::endl;
+				for (string::iterator it = test.begin(); it != test.end(); it++)
+					if(!isdigit(*it))
+						throw std::invalid_argument("listen port is not a digit");
+			}
+
+			void	endoflineCheck(key_type& config)
+			{
+				if (!config.empty())
+				{
+					string text = config.back();
+					if (!text.empty())
+					{
+						// std::cout << " STRING IS === " << text << std::endl;
+						if (text.back() != ';')
+							throw std::invalid_argument("end of line missing : ';'");
+						else
+							config.back().pop_back();
+					}
+				}
+			}
+			
+			void	locationChecking(value_type server)
+			{
+				key_type vec = server.getLocationKey();
+				for (key_iterator it = vec.begin(); it != vec.end(); it++)
+				{
+					if (it->front() != '/')
+						throw std::invalid_argument("invalid location");
+				}
+			}
+
+			void	errorChecking(void)
+			{
+				for (iterator it = server.begin(); it != server.end(); it++)
+				{
+					checkPort(*it);
+					locationChecking(*it);
+				}
+			}
+
 	};
 }
 #endif

@@ -4,11 +4,13 @@
 # include <map>
 # include <iostream>
 # include <vector>
+#include <sstream>
 
 using std::multimap;
 using std::map;
 using std::string;
 using std::vector;
+using std::stringstream;
 
 namespace ft{
 	class ServerBlock{
@@ -17,6 +19,9 @@ namespace ft{
 		typedef vector<string>					value_type;
 		typedef map<string, value_type >		config_type;
 		typedef	multimap<string, config_type>		location_type;
+		typedef	config_type::iterator				config_iterator;
+		typedef	location_type::iterator				location_iterator;
+		typedef value_type::iterator				iterator;
 		
 
 		void	addConfig(key_type key, value_type value)
@@ -61,6 +66,47 @@ namespace ft{
 			}
 		}
 
+		value_type	getConfigInfo(const key_type& key)
+		{
+			return (getinfo(this->config, key));
+		}
+
+		value_type	getinfo(config_type& conf, const key_type& key)
+		{
+			config_iterator it;
+			it = conf.find(key);
+			if (it == conf.end())
+				throw std::out_of_range("Key not found");
+			return it->second;
+		}
+
+
+		value_type	getLocationKey(void)
+		{
+			value_type	keyvector;
+			for (location_iterator it = location.begin(); it != location.end(); it++)
+				keyvector.push_back(it->first);
+			return keyvector;
+		}
+		
+		value_type	getLocationInfo(const key_type &loc, const key_type& key)
+		{
+			location_iterator it;
+			it = location.find(loc);
+			if (it == location.end())
+				throw std::out_of_range("Key not found");
+			return (getinfo(it->second, key));
+		}
+
+		int	getPortNo(void)
+		{
+			value_type lol = getConfigInfo("listen");
+			stringstream ss(lol.front());
+			int	port;
+			ss >> port;
+			return (port);
+		}
+
 		location_type	getLocation(void)
 		{
 			return this->location;
@@ -81,6 +127,23 @@ namespace ft{
 			}
 
 		}
+
+		// void	updateConfig(config_type con)
+		// {
+		// 	this->config = con;
+		// }
+
+
+		// void	updateConfigz(config_type ori, config_type update)
+		// {
+		// 	ori = update;
+		// }
+
+		// void	updateLocation(location_type loc)
+		// {
+		// 	this->location = loc;
+		// 	for (location_iterator it = loc.begin(); it != loc.end(); it++)
+		// }
 
 		config_type	getConfig(void)
 		{
