@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include <iostream>
+#include <fcntl.h>
 
 namespace ft
 {
@@ -98,8 +99,20 @@ namespace ft
 				socklen_t addr_len = sizeof(address);
 
 				client_fd = accept(socket_fd, (struct sockaddr *)&address, &addr_len);
+
 				if (client_fd < 0)
 					throw std::runtime_error("Failed to accept connection");
+
+				// int flags = fcntl(client_fd, F_GETFL, 0);
+				// if (flags < 0)
+				// {
+				// 	throw std::runtime_error("Failed to get client socket flags");
+				// }
+
+				// if (fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) < 0)
+				// {
+				// 	throw std::runtime_error("Failed to set socket to non-blocking mode");
+				// }
 
 				return client_fd;
 			}

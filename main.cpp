@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <poll.h>
 #include "./Server/Server.hpp"
 
 int	main(void)
@@ -33,8 +34,21 @@ int	main(void)
 
 		servers.push_back(server);
 
-		// Run and await connections
-		// server.run();
+		server.run(); // Currently blocking, but the next one will crash
 	}
+
+	// Need to do a while loop like this, but poll must be inside if not it cannot accept anything
+	// while(1)
+	// {
+	// 	for (unsigned int i = 0; i < servers.size(); i++)
+	// 	{
+	// 		// Run and await connections
+	// 		try {
+	// 			servers[i].run();
+	// 		} catch (std::exception ex) {
+	// 			// std::cout << ex.what() << std::endl;
+	// 		}
+	// 	}
+	// }
 
 }
