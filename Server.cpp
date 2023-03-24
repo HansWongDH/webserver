@@ -20,10 +20,10 @@ int	main(void)
 	vector<struct pollfd> fds(Serverlist.size());
 	char buf[3000];
 
-int i = 0;
-for (ft::Parser::server_iterator it = Serverlist.begin(); it != Serverlist.end(); it++, i++)
+
+for (int i = 0; i < Serverlist.size(); i++)
 	{
-		fds[i].fd = it->getSocket().getSocketfd();
+		fds[i].fd = Serverlist[i].getSocket().getSocketfd();
 		fds[i].events = POLLIN;
 		fds[i].revents = 0;
 	}
@@ -37,7 +37,7 @@ while (1)
 		if (poll(&fds[0], fds.size(), 100))
 		{
 		
-			std::cout << " fds revents is " <<  fds.data()->revents<< std::endl;
+			// std::cout << " fds revents is " <<  fds.data()->revents<< std::endl;
 			for(int i = 0; i < fds.size(); i++)
 			{
 			if (i < server_size)

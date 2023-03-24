@@ -12,7 +12,7 @@ namespace ft
 	class Socket {
 		public:
 			~Socket() {
-				close(socket_fd);
+				// close(socket_fd);
 			}
 
 			/**
