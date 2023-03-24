@@ -32,8 +32,8 @@ for (ft::Parser::server_iterator it = Serverlist.begin(); it != Serverlist.end()
 
 	int	server_size = Serverlist.size();
 			std::cout << " fds revents is " <<  fds.data()->revents<< std::endl;
-// while (1)
-// {
+while (1)
+{
 		if (poll(&fds[0], fds.size(), 100))
 		{
 		
@@ -81,7 +81,7 @@ for (ft::Parser::server_iterator it = Serverlist.begin(); it != Serverlist.end()
 				// }
 			
 		}
-// }
+}
 
 
 
