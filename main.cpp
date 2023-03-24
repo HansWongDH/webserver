@@ -104,7 +104,6 @@ int	main(void)
 		
 			for(int i = 0; i < fds.size(); i++)
 			{
-					// std::cout << "event is === " <<fds[i].revents << std::endl;
 			if (i < server_size)
 			{
 				if(fds[i].revents == 0)
@@ -122,14 +121,10 @@ int	main(void)
 				{
 					// if (fds[i].fd)
 					// {
-					// if (haha == true)
-					// 	{
-					// 		std::cout << "hajhahaahahahahah" << std::endl;
-					// 		fds[i].fd = -1;
-					// 		poll_length--;
-					// 		haha = false;
-					// 		break;
-					// 	}
+					if (fds[i].revents & POLLHUP)
+						{
+							fds.erase(&fds[i]);
+						}
 						if (fds[i].revents & POLLIN)
 						{
 							std::cout<< "connected" << std::endl;
