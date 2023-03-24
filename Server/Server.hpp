@@ -4,7 +4,7 @@
 # include <unistd.h>
 # include "Socket.hpp"
 # include "../Parser/Serverblock.hpp"
-
+# include "../Server/Client.hpp"
 namespace ft
 {
     class Server

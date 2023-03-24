@@ -4,7 +4,7 @@ SRC_DIR		= ./
 OBJ_DIR		= obj
 INC_DIR		= inc
 
-SRC_FILES	= main.cpp
+SRC_FILES	= Server.cpp
 
 GCC 		= c++
 CFLAGS		= -Wall -Wextra -Werror
