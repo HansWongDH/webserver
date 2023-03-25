@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "Serverblock.hpp"
+#include "Serverinfo.hpp"
 #include "../Server/HTTPServer.hpp"
 // #include "../Server/Server.hpp"
 
@@ -17,11 +17,11 @@ using std::stringstream;
 namespace 	ft{
 	class Parser {
 		public:
-			typedef	ft::ServerBlock::value_type string_type;
+			typedef	ft::ServerInfo::value_type string_type;
 			typedef	string_type::iterator	string_iterator;
-			typedef ft::ServerBlock		value_type;
+			typedef ft::ServerInfo	value_type;
 			typedef ft::Server			server_type;
-			typedef ft::ServerBlock::config_type	config_type;
+			typedef ft::ServerInfo::config_type	config_type;
 			typedef	vector<value_type>	value_vector;
 			typedef	value_vector::iterator	value_iterator;
 			typedef ft::HTTPServer			serverlist_type;

@@ -1,5 +1,5 @@
-#ifndef SERVERBLOCK_HPP
-# define SERVERBLOCK_HPP
+#ifndef SERVERINFO_HPP
+#define SERVERINFO_HPP
 
 # include <map>
 # include <iostream>
@@ -15,7 +15,7 @@ using std::vector;
 using std::stringstream;
 
 namespace ft{
-	class ServerBlock{
+	class ServerInfo{
 		public:
 		typedef string							key_type;
 		typedef vector<string>					value_type;
@@ -25,16 +25,16 @@ namespace ft{
 		typedef	location_type::iterator				location_iterator;
 		typedef value_type::iterator				iterator;
 		
-		ServerBlock()
+		ServerInfo()
 		{
 		
 		}
-		~ServerBlock()
+		~ServerInfo()
 		{
 			
 		}
 
-		ServerBlock(const ServerBlock& other)
+		ServerInfo(const ServerInfo& other)
 		{
 			this->config = other.config;
 			this->location = other.location;
@@ -172,3 +172,5 @@ namespace ft{
 }
 
 #endif
+
+

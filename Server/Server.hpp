@@ -4,7 +4,7 @@
 # include <unistd.h>
 # include <map>
 # include "Socket.hpp"
-# include "../Parser/Serverblock.hpp"
+# include "../Parser/Serverinfo.hpp"
 # include "../Server/Client.hpp"
 namespace ft
 {
@@ -12,7 +12,7 @@ namespace ft
     {
         public:
             Server() {}
-            Server(int port, ft::ServerBlock serv): socket(port), server(serv) {
+            Server(int port, ft::ServerInfo serv): socket(port), server(serv) {
                 // client_fd = socket.accept_connection();
             }
             
@@ -59,7 +59,7 @@ namespace ft
             // }
 
         private:
-            ft::ServerBlock server;
+            ft::ServerInfo server;
             ft::Socket socket;
             std::map<int, ft::Client> client;
 
