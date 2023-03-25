@@ -1,5 +1,6 @@
 #include "./Server/Server.hpp"
 #include "./Parser/Parser.hpp"
+#include "./includes/colour.h"
 #include <iostream>
 #include <vector>
 #include <poll.h>
@@ -33,13 +34,13 @@ int main(void)
 
 	int server_size = Serverlist.size();
 			bool connection = false;
-	std::cout << " fds size is " << fds.size()  << std::endl;
+	cout << " fds size is " << fds.size()  << endl;
 	while (1)
 	{
 
 		if (poll(&fds[0], fds.size(), 100))
 		{
-			// std::cout << " fds revents is " <<  fds.data()->revents<< std::endl;
+			// cout << " fds revents is " <<  fds.data()->revents<< endl;
 			for (int i = 0; i < fds.size(); i++)
 			{
 				if (fds[i].revents == 0)
@@ -48,11 +49,11 @@ int main(void)
 				{
 					if (fds[i].revents & POLLIN)
 					{
-						std::cout << "connected" << std::endl;
 						struct pollfd tmp;
 						tmp.fd = Serverlist.findServer(fds[i].fd).getSocket().accept_connection();
 						Serverlist.newClient(tmp.fd, fds[i].fd);
 						tmp.events = POLLIN;
+						cout << CYAN "[INFO] Incoming connection connected to FD: " << fds[i].fd << " with client FD: " << tmp.fd <<  RESET << endl;
 						fds.push_back(tmp);
 					}
 				}
@@ -68,10 +69,11 @@ int main(void)
 						int ret = read(fds[i].fd, buf, 3000);
 						if (ret)
 						{
+							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 							stringstream ss(buf);
 							std::string str;
 							ss >> str;
-							std::cout<< str << std::endl;
+							std::cout<< str << endl;
 							fds[i].events = POLLOUT;
 						}
 						else
@@ -79,7 +81,7 @@ int main(void)
 					}
 					else if (fds[i].revents & POLLOUT)
 					{
-						std::cout << "SENDING" << std::endl;
+						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 						write(fds[i].fd, "HAHAHAHAHAHAHAAHAH", 19);
 						fds[i].events = POLLIN;
 						// poll_length--;
@@ -87,7 +89,8 @@ int main(void)
 					if (fds[i].revents & POLLHUP || connection == true)
 					{
 						Serverlist.deleteClient(fds[i].fd);
-						std::cout << "Deleteing client fd : " << fds[i].fd << " that connnected to server fd : " << Serverlist.findServerfd(fds[i].fd) << std::endl;
+						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
+						<< Serverlist.findServerfd(fds[i].fd) <<  RESET <<  endl;
 						fds.erase(fds.begin() + i);
 						connection = false;
 					}
