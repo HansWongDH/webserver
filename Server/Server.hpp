@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 # include <unistd.h>
+# include <map>
 # include "Socket.hpp"
 # include "../Parser/Serverblock.hpp"
 # include "../Server/Client.hpp"
@@ -34,6 +35,24 @@ namespace ft
                 return this->socket;
             }
 
+            int getFd(void)
+            {
+                return this->socket.getSocketfd();
+            }
+
+  
+
+            void	insertClient(int server_id, int client_fd)
+			{
+				ft::Client tmp(server_id);
+				
+				client.insert(std::make_pair(client_fd, tmp));
+			}
+
+			void	eraseClient(int client_fd)
+			{
+				client.erase(client_fd);
+			}
             // void    bind_fd(int fd)
             // {
             //     client_fd = fd;
@@ -42,7 +61,9 @@ namespace ft
         private:
             ft::ServerBlock server;
             ft::Socket socket;
-            std::vector<int> fd;
+            std::map<int, ft::Client> client;
+
+
     };
 }
 

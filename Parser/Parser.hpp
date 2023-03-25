@@ -7,7 +7,8 @@
 #include <string>
 #include <sstream>
 #include "Serverblock.hpp"
-#include "../Server/Server.hpp"
+#include "../Server/HTTPServer.hpp"
+// #include "../Server/Server.hpp"
 
 using std::string;
 using std::multimap;
@@ -23,8 +24,7 @@ namespace 	ft{
 			typedef ft::ServerBlock::config_type	config_type;
 			typedef	vector<value_type>	value_vector;
 			typedef	value_vector::iterator	value_iterator;
-			typedef	vector<server_type>	server_vector;
-			typedef server_vector::iterator	server_iterator;
+			typedef ft::HTTPServer			serverlist_type;
 		
 
 		
@@ -44,14 +44,23 @@ namespace 	ft{
 				return this->conf;
 			}
 
-			server_vector	getServer(void)
+			serverlist_type	getHTTPServer() const
 			{
 				return this->servers;
 			}
+			// void	findMatchingClient(server_vector& vec, int client_fd)
+			// {
+			// 	for (server_iterator it = vec.begin(); it != vec.end(); it++)
+			// 	{
+			// 			ft::Client client = it->getClient(client_fd);
+			// 			if (client != NULL)
+			// 				return client;
+			// 	}
+			// }
 			private:
 				vector<string>	info;
 				value_vector	conf;
-				server_vector	servers;
+				serverlist_type		servers;
 
 
 
@@ -187,7 +196,7 @@ namespace 	ft{
 			void	initalizeServer(int port, value_type block)
 			{
 				server_type server(port, block);
-				this->servers.push_back(server);
+				this->servers.insertServer(server.getFd(), server);
 			}
 
 			void	errorChecking(void)

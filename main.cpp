@@ -32,22 +32,19 @@ int	main(void)
 	// ft::Parser lol(file, test);
 	// std::vector<struct pollfd> fds;
 
-	// std::vector<ft::ServerBlock> vet;
-	// std::vector<ft::Server> Servers;
-	// vet = lol.getServerInfo();
-
 	
-	// for (std::vector<ft::ServerBlock>::iterator it = vet.begin(); it != vet.end(); it++)
-	// {
-	// 	ft::Server server = ft::Server(it->getPortNo(), *it);
-	// 	Servers.push_back(server);
-		
-	// 	// it->printConfig();
-	// 	// std::cout << "---------------------------" << std::endl;
-	// 	// it->printLocation();
-	// 	// std::cout << "===========================" << std::endl;
-	// 		// std::cout << "current i is " << i << std::endl;	
-	// }
+	// std::vector<ft::Server> Servers;
+	ft::Parser::value_vector vet = Parse.getServerInfo();
+
+	std::vector<ft::ServerBlock> vet;
+	for (ft::Parser::value_iterator it = vet.begin(); it != vet.end(); it++)
+	{
+
+		it->printConfig();
+		std::cout << "---------------------------" << std::endl;
+		it->printLocation();
+		std::cout << "===========================" << std::endl;
+	}
 
 
 

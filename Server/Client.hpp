@@ -1,14 +1,14 @@
 #include <iostream>
 
 namespace ft{
-	class Client {
-		public:
+	struct Client {
 			Client(){};
 			~Client() {};
-			Client(int fd) : server_fd(fd) {}
-		private:
-			int	client_fd;
-			int	server_fd;
+			Client(int server_id) : server_id(server_id) {}
+
+			int	getRequest(){}
+			int	getRespond(){}
+			int	server_id;
 			std::string	request;
 			std::string respond;
 	};
