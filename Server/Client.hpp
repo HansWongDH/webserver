@@ -36,15 +36,14 @@ namespace ft{
 
 			void	insertRequest(char *buf)
 			{
+				this->request->clear();
 				this->request->assign(buf, buf + strlen(buf));
-				std::cout << "insertRequest: " << *this->request << std::endl;
 			}
 
 			void	insertRespond(char *buf)
 			{
-				// this->respond->assign(buf, buf + strlen(buf));
-				std::string temp(buf);
-				this->respond->insert(0, temp);
+				this->respond->clear();
+				this->respond->assign(buf, buf + strlen(buf));
 			}
 			int	server_fd;
 			std::string	*request;
