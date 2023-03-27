@@ -25,7 +25,7 @@ namespace ft
 			typedef	ft::Server				value_type;
 			typedef value_type&				reference;
 			typedef map<int, ft::Server>	servermap_type;
-			typedef map<int, int>			clientmap_type;
+			typedef map<int, ft::Client>	clientmap_type;
 			typedef servermap_type::iterator	iterator;
 			typedef clientmap_type::iterator	clientmap_iterator;
 
@@ -33,7 +33,7 @@ namespace ft
 			HTTPServer() : Serverlist() {}
 			~HTTPServer(){}
 
-			HTTPServer(const HTTPServer& other) : Serverlist(other.Serverlist), clientlist(other.clientlist)
+			HTTPServer(const HTTPServer& other) : Serverlist(other.Serverlist), Clientlist(other.Clientlist)
 			{
 			}
 
@@ -75,20 +75,33 @@ namespace ft
 			// {
 			// 	return *(this->begin() + n);
 			// }
-			void	newClient(int client_fd, int server_fd)
-			{
-				this->clientlist.insert(std::make_pair(client_fd, server_fd));
-				findServer(server_fd).insertClient(server_fd, client_fd);
-			}
+			// void	newClient(int client_fd, int server_fd)
+			// {
+			// 	this->Clientlist.insert(std::make_pair(client_fd, server_fd));
+			// }
 
 			int	findServerfd(int client_fd)
 			{
-				return clientlist.find(client_fd)->second;
+				return 	Clientlist.find(client_fd)->second.server_fd;
 			}
 
-			void	deleteClient(int client_fd)
+
+			void	insertClient(int server_id, int client_fd)
 			{
-				findServer(findServerfd(client_fd)).eraseClient(client_fd);
+				ft::Client tmp(server_id);
+				
+				Clientlist.insert(std::make_pair(client_fd, tmp));
+			}
+
+			void	eraseClient(int client_fd)
+			{
+				Clientlist.erase(client_fd);
+				close(client_fd);
+			}
+
+			ft::Client	findClient(int client_fd)
+			{
+				return Clientlist.find(client_fd)->second;
 			}
 			/**
 			 * @brief 
@@ -107,7 +120,7 @@ namespace ft
 
 		private:
 			servermap_type	Serverlist;
-			clientmap_type	clientlist;
+			clientmap_type	Clientlist;
 	};
 } // namespace ft
 
