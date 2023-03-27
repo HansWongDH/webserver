@@ -38,7 +38,7 @@ int main(void)
 	while (1)
 	{
 
-		if (poll(&fds[0], fds.size(), 100))
+		if (poll(&fds[0], fds.size(), 1000))
 		{
 			// cout << " fds revents is " <<  fds.data()->revents<< endl;
 			for (int i = 0; i < fds.size(); i++)
@@ -54,6 +54,9 @@ int main(void)
 						Serverlist.insertClient(fds[i].fd, tmp.fd);
 						tmp.events = POLLIN;
 						cout << CYAN "[INFO] Incoming connection connected to FD: " << fds[i].fd << " with client FD: " << tmp.fd <<  RESET << endl;
+						
+						// Insert response here
+						Serverlist.findClient(fds[i].fd).insertRespond("TEst");
 						fds.push_back(tmp);
 					}
 				}
@@ -61,27 +64,30 @@ int main(void)
 				{
 					if (fds[i].revents & POLLIN)
 					{
-				
+						// cout << i << "," << fds[i].fd << endl;
+						// cout << Serverlist.findClient(fds[i].fd).getRespond() << endl;
 						int ret = read(fds[i].fd, buf, 3000);
 						if (ret)
 						{
+							cout << "TEST" << endl;
 							Serverlist.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 				
-							cout<< Serverlist.findClient(fds[i].fd).getRequest() << endl;
+							cout << "Here: " << Serverlist.findClient(fds[i].fd).getRequest() << endl;
 							fds[i].events = POLLOUT;
 						}
-						else
-							connection = true;
+						// else
+						// 	connection = true;
 					}
 					else if (fds[i].revents & POLLOUT)
 					{
+						//  && Serverlist.findClient(fds[i].fd).respondEmpty() == false
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 						write(fds[i].fd, "HAHAHAHAHAHAHAAHAH", 19);
 						fds[i].events = POLLIN;
 						// poll_length--;
 					}
-					if (fds[i].revents & POLLHUP || connection == true)
+					if (fds[i].revents & POLLHUP)
 					{
 						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
 						<< Serverlist.findServerfd(fds[i].fd) <<  RESET <<  endl;

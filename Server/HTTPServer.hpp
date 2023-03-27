@@ -89,8 +89,8 @@ namespace ft
 			void	insertClient(int server_id, int client_fd)
 			{
 				ft::Client tmp(server_id);
-				
 				Clientlist.insert(std::make_pair(client_fd, tmp));
+				ft::Client temp = Clientlist.find(client_fd)->second;
 			}
 
 			void	eraseClient(int client_fd)

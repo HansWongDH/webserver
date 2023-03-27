@@ -9,7 +9,7 @@ SRC_FILES	= main.cpp
 GCC 		= c++
 CFLAGS		= -Wall -Wextra -Werror
 C++FLAGS	= -std=c++98
-SANITIZE	= -fsanitize=address -g3
+SANITIZE	= 
 RM			= rm -f
 
 OBJ_FILES	= $(addprefix , $(SRC_FILES:.c=.o))
