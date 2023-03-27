@@ -12,7 +12,7 @@ namespace ft
     {
         public:
             Server() {}
-            Server(int port, ft::ServerInfo serv): socket(port), server(serv) {
+            Server(int port, ft::ServerInfo serv): socket(port), info(serv) {
                 // client_fd = socket.accept_connection();
             }
             
@@ -40,13 +40,17 @@ namespace ft
                 return this->socket.getSocketfd();
             }
 
+            ft::ServerInfo  getInfo(void)
+            {
+                return this->info;
+            }
             // void    bind_fd(int fd)
             // {
             //     client_fd = fd;
             // }
 
         private:
-            ft::ServerInfo server;
+            ft::ServerInfo info;
             ft::Socket socket;
 
 

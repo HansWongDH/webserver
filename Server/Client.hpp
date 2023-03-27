@@ -1,38 +1,66 @@
 #include <iostream>
 
 namespace ft{
-	struct Client {
-			Client(){};
-			~Client() {};
-			Client(int server_fd) : server_fd(server_fd) {}
-
-			std::string	getRequest(){
-				return this->request;
+	class Client {
+		public:
+			Client(){
+				this->request = new std::string;
+				this->respond = new std::string;
 			}
-			std::string	getRespond(){
-				return this->respond;
+			~Client() {
+				// if(this->request)
+				// 	delete request;
+				// if (this->respond)
+				// 	delete respond;
+			};
+			Client(int server_fd) : server_fd(server_fd) {
+				this->request = new std::string;
+				this->respond = new std::string;
+			}
+			
+			int	Parse_request(void)
+			{
+				string temp;
+				std::stringstream ss(getRequest());
+				ss >> temp;
+				std::cout << temp << std::endl;
+				if (!temp.compare("GET"))
+				{
+								std::cout << temp << std::endl;
+					return (1);
+				}
+				return (0);
+			}
+			std::string	getRequest() const {
+				return *this->request;
+			}
+			std::string	getRespond() const {
+				return *this->respond;
 			}
 			bool	requestEmpty()
 			{
-				return request.empty();
+				return request->empty();
 			}
 
 			bool	respondEmpty()
 			{
-				return respond.empty();
+				return respond->empty();
 			}
 
-			void	insertRequest(char *buf)
+			void	insertRequest(char *buf, size_t size)
 			{
-				this->request.assign(buf, buf + strlen(buf));
+				this->request->clear();
+				this->request->append(buf, size);
+				std::cout << this->request << std::endl;
 			}
+			
 
-			void	insertRespond(char *buf)
+			void	insertRespond(string buf)
 			{
-				this->respond.assign(buf, buf + strlen(buf));
+				this->respond->assign(buf.begin(), buf.end());
 			}
 			int	server_fd;
-			std::string	request;
-			std::string respond;
+			std::string	*request;
+			std::string *respond;
 	};
 }

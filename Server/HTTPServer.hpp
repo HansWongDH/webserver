@@ -103,6 +103,30 @@ namespace ft
 			{
 				return Clientlist.find(client_fd)->second;
 			}
+
+			void	request(int client_fd)
+			{
+				ft::Client client = findClient(client_fd);
+				if (client.Parse_request() == 1)
+				{
+					std::cout << "ajawsdad" << std::endl;
+					request_GET(client, "/");
+				}
+			}
+
+			void	request_GET(ft::Client client, string key)
+			{
+				vector<string> vec = findServer(client.server_fd).getInfo().getLocationInfo(key, "index");
+				string dir = "root";
+					std::cout << dir << std::endl;
+				dir.append(key);
+				dir.append(*vec.begin());
+			
+				std::ifstream file(dir);
+				std::stringstream buffer;
+				buffer << file.rdbuf();
+				client.insertRespond(buffer.str());
+			}
 			/**
 			 * @brief 
 			 * 

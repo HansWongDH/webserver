@@ -19,7 +19,7 @@ int main(void)
 
 	ft::HTTPServer	Serverlist(Parse.getHTTPServer());
 	vector<struct pollfd> fds;
-	char buf[3000];
+	char buf[65535];
 
 
 	for (ft::HTTPServer::iterator it = Serverlist.begin(); it != Serverlist.end(); it++)
@@ -65,11 +65,13 @@ int main(void)
 						int ret = read(fds[i].fd, buf, 3000);
 						if (ret)
 						{
-							Serverlist.findClient(fds[i].fd).insertRequest(buf);
+							Serverlist.findClient(fds[i].fd).insertRequest(buf, ret);
+							Serverlist.request(fds[i].fd);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 				
-							cout<< Serverlist.findClient(fds[i].fd).getRequest() << endl;
+							// cout << Serverlist.findClient(fds[i].fd).getRequest();
 							fds[i].events = POLLOUT;
+							Serverlist.findClient(fds[i].fd).getRequest().clear();
 						}
 						else
 							connection = true;
@@ -77,7 +79,10 @@ int main(void)
 					else if (fds[i].revents & POLLOUT)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
-						write(fds[i].fd, "HAHAHAHAHAHAHAAHAH", 19);
+						std::string HAHA = Serverlist.findClient(fds[i].fd).getRespond().c_str();
+						const char *str = HAHA.c_str();
+						write(fds[i].fd, str, strlen(str));
+						std::cout << Serverlist.findClient(fds[i].fd).getRespond() << std::endl;
 						fds[i].events = POLLIN;
 						// poll_length--;
 					}
