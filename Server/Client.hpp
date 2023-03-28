@@ -45,6 +45,8 @@ namespace ft{
 				string tmp = buf;
 				request->parse_header(tmp);
 				respond->parseRespond(this->request);
+								request->requestClear();
+			
 				// std::cout << this->request << std::endl;
 			}
 			

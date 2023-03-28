@@ -50,6 +50,12 @@ namespace ft{
 			{
 				return this->method;
 			}
+
+			void	requestClear()
+			{
+				method = 0;
+				this->target.clear();
+			}
 		private:
 			int	method;
 			string target;

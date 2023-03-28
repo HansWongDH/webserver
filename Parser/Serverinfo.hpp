@@ -111,8 +111,7 @@ namespace ft{
 			it = location.find(loc);
 			if (it == location.end())
 			{
-				std::cout << "here 1" << std::endl;
-				throw std::out_of_range("Key not found");
+				it = location.find("/");
 			}
 			return (getinfo(it->second, key));
 		}

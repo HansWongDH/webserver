@@ -15,7 +15,7 @@ namespace ft
 			ft::ServerInfo	info;
 			string _respond;
 			int	size;
-			const char	*_return;
+			char	_return[BUFFER_SIZE];
 		public:
 			Respond(ft::ServerInfo info) : info(info), _respond(), size(0) {}
 			~Respond(){}
@@ -45,9 +45,11 @@ namespace ft
 				string root = ROOT;
 				for (ft::ServerInfo::iterator it = vec.begin(); it != vec.end(); it++)
 				{
+									// std::cout << "HEREREREREREREE ============ " << root + request->getTarget() + *it << std::endl;
 					file.open(root + request->getTarget() + *it);
 					if (file.is_open())
 						break ;
+	
 				}
 				if (!file.is_open())
 					throw std::invalid_argument("Unable to find file");
@@ -67,23 +69,21 @@ namespace ft
 			}
 			char* returnRespond(void)
 			{
-				char *ret;
 				if (this->size > BUFFER_SIZE)
 				{
 					string tmp = _respond.substr(0, BUFFER_SIZE);
 					size -= BUFFER_SIZE;
-					// std::cout << "tmp here" << tmp << "size === " << size << std::endl;
+				
 					_respond.erase(0, BUFFER_SIZE);
-					ret = const_cast<char *>(tmp.c_str());
+					std::strcpy(_return, tmp.c_str());
 				}
 				else
 				{
 					size = 0;
-					ret = const_cast<char *>(_respond.c_str());
+					std::strcpy(_return, _respond.c_str());
 					_respond.clear();
 				}
-				// std::cout << "==========="<< std::endl;
-				return ret;
+				return this->_return;
 			}
 
 			bool	empty()
@@ -91,6 +91,11 @@ namespace ft
 				if (size == 0)
 					return true;
 				return false;
+			}
+
+			int	getSize()
+			{
+				return this->size;
 			}
 
 
