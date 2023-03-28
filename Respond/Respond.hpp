@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <string.h> 
 #include "../Request/Request.hpp"
 #include "../Parser/Serverinfo.hpp"
 #include "../includes/colour.h"
@@ -18,12 +19,14 @@ namespace ft
 			char	_return[BUFFER_SIZE];
 		public:
 			Respond(ft::ServerInfo info) : info(info), _respond(), size(0) {}
-			~Respond(){}
+			~Respond(){
+
+			}
 
 			void	insertRespond(string infile)
 			{
 				this->_respond = infile;
-				this->size += infile.size();
+				this->size = infile.size();
 			}
 			
 			void	parseRespond(ft::Request *request)
@@ -38,6 +41,12 @@ namespace ft
 					return ;
 			}
 
+			string	headerGenerator(ft::Request *request)
+			{
+				string tmp = request->getVersion();
+				tmp.append(" 200 OK \nContent-Type: */*\r\n");
+				return tmp;
+			}
 			void	methodGet(ft::Request *request)
 			{
 				ft::ServerInfo::value_type vec = info.getLocationInfo(request->getTarget(), "index");
@@ -45,17 +54,21 @@ namespace ft
 				string root = ROOT;
 				for (ft::ServerInfo::iterator it = vec.begin(); it != vec.end(); it++)
 				{
-									// std::cout << "HEREREREREREREE ============ " << root + request->getTarget() + *it << std::endl;
-					file.open(root + request->getTarget() + *it);
+					if (request->getTarget().compare("/"))
+						file.open(root + request->getTarget() + "/" + *it);
+					else
+						file.open(root + request->getTarget() + *it);
 					if (file.is_open())
 						break ;
 	
 				}
 				if (!file.is_open())
-					throw std::invalid_argument("Unable to find file");
+					file.open(root + "/404.html");
 				string file_content((std::istreambuf_iterator<char>(file)),
                           std::istreambuf_iterator<char>());
-				insertRespond(file_content);
+				string tmp = headerGenerator(request);
+				tmp.append(file_content);
+				insertRespond(tmp);
 			}
 
 			void	methodPost(ft::Request *request)
@@ -75,12 +88,14 @@ namespace ft
 					size -= BUFFER_SIZE;
 				
 					_respond.erase(0, BUFFER_SIZE);
-					std::strcpy(_return, tmp.c_str());
+					strlcpy(_return, tmp.c_str(), tmp.size());
 				}
 				else
 				{
+					strlcpy(_return, _respond.c_str(), _respond.size());
+					std::cout << "what is the size? ====" << _respond.size() <<  " === " << strlen(_return) << std::endl;
+					
 					size = 0;
-					std::strcpy(_return, _respond.c_str());
 					_respond.clear();
 				}
 				return this->_return;

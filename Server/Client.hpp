@@ -13,11 +13,9 @@ namespace ft{
 				this->respond = new ft::Respond(info);
 			}
 			~Client() {
-				// if(this->request)
-				// 	delete request;
-				// if (this->respond)
-				// 	delete respond;
-			};
+				// delete this->request;
+				// delete this->respond;
+			}
 			Client(int server_fd, ft::ServerInfo info) : server_fd(server_fd) {
 				this->request = new ft::Request;
 				this->respond = new ft::Respond(info);

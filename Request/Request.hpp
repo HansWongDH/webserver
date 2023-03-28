@@ -16,7 +16,7 @@ namespace ft{
 	class Request{
 		public:
 			Request(){};
-			~Request();
+			~Request() {};
 			Request(string	header){
 				parse_header(header);
 			}
@@ -38,7 +38,7 @@ namespace ft{
 					throw std::invalid_argument("Invalid Method");
 				}
 				ss >> target;
-
+				ss >> version;
 			}
 
 			string	getTarget(void) const
@@ -51,6 +51,10 @@ namespace ft{
 				return this->method;
 			}
 
+			string getVersion(void)
+			{
+				return this->version;
+			}
 			void	requestClear()
 			{
 				method = 0;
@@ -59,6 +63,7 @@ namespace ft{
 		private:
 			int	method;
 			string target;
+			string version;
 			string body;
 
 	};
