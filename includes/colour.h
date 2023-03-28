@@ -9,5 +9,7 @@
 #define MAGENTA  "\x1B[35m"
 #define CYAN  "\x1B[36m"
 
+#define BUFFER_SIZE	3000
+#define ROOT "root";
 #endif
 

@@ -2,13 +2,15 @@
 #define CLIENT_HPP
 
 #include <iostream>
-#
+#include "../Request/Request.hpp"
+#include "../Respond/Respond.hpp"
+#include "../Parser/Serverinfo.hpp"
 namespace ft{
 	class Client {
 		public:
-			Client(){
-				this->request = new std::string;
-				this->respond = new std::string;
+			Client(ft::ServerInfo info){
+				this->request = new ft::Request;
+				this->respond = new ft::Respond(info);
 			}
 			~Client() {
 				// if(this->request)
@@ -16,46 +18,35 @@ namespace ft{
 				// if (this->respond)
 				// 	delete respond;
 			};
-			Client(int server_fd) : server_fd(server_fd) {
-				this->request = new std::string;
-				this->respond = new std::string;
+			Client(int server_fd, ft::ServerInfo info) : server_fd(server_fd) {
+				this->request = new ft::Request;
+				this->respond = new ft::Respond(info);
 			}
 			
-			int	Parse_request(void)
-			{
-				string temp;
-				std::stringstream ss(getRequest());
-				ss >> temp;
-				std::cout << temp << std::endl;
-				if (!temp.compare("GET"))
-				{
-								std::cout << temp << std::endl;
-					return (1);
-				}
-				return (0);
+			ft::Request	*getRequest() const {
+				return this->request;
 			}
-			std::string	getRequest() const {
-				return *this->request;
+			ft::Respond	*getRespond() const {
+				return this->respond;
 			}
-			std::string	getRespond() const {
-				return *this->respond;
-			}
-			bool	requestEmpty()
-			{
-				return request->empty();
-			}
+
+			// bool	requestEmpty()
+			// {
+			// 	return request->empty();
+			// }
 
 			bool	respondEmpty()
 			{
 				return respond->empty();
 			}
 
-			// void	insertRequest(char *buf, size_t size)
-			// {
-			// 	this->request->clear();
-			// 	this->request->append(buf, size);
-			// 	std::cout << this->request << std::endl;
-			// }
+			void	insertRequest(char *buf)
+			{
+				string tmp = buf;
+				request->parse_header(tmp);
+				respond->parseRespond(this->request);
+				// std::cout << this->request << std::endl;
+			}
 			
 
 			// void	insertRespond(string buf)
@@ -63,8 +54,8 @@ namespace ft{
 			// 	this->respond->assign(buf.begin(), buf.end());
 			// }
 			int	server_fd;
-			std::string	*request;
-			std::string *respond;
+			ft::Request		*request;
+			ft::Respond		*respond;
 	};
 }
 

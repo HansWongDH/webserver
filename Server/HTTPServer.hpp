@@ -1,9 +1,9 @@
 #ifndef HTTPSERVER_HPP
 #define HTTPSERVER_HPP
 
-#define BUFFER_SIZE 200
 #include <vector>
 #include "Server.hpp"
+#include "Client.hpp"
 
 using std::map;
 
@@ -89,7 +89,7 @@ namespace ft
 
 			void	insertClient(int server_id, int client_fd)
 			{
-				ft::Client tmp(server_id);
+				ft::Client tmp(server_id, findServer(server_id).getInfo());
 				
 				Clientlist.insert(std::make_pair(client_fd, tmp));
 			}
@@ -105,29 +105,20 @@ namespace ft
 				return Clientlist.find(client_fd)->second;
 			}
 
-			void	request(int client_fd)
-			{
-				ft::Client client = findClient(client_fd);
-				if (client.Parse_request() == 1)
-				{
-					std::cout << "ajawsdad" << std::endl;
-					request_GET(client, "/");
-				}
-			}
 
-			void	method_GET(ft::Client client, string key)
-			{
-				vector<string> vec = findServer(client.server_fd).getInfo().getLocationInfo(key, "index");
-				string dir = "root";
-					std::cout << dir << std::endl;
-				dir.append(key);
-				dir.append(*vec.begin());
+			// void	method_GET(ft::Client client, string key)
+			// {
+			// 	vector<string> vec = findServer(client.server_fd).getInfo().getLocationInfo(key, "index");
+			// 	string dir = "root";
+			// 		std::cout << dir << std::endl;
+			// 	dir.append(key);
+			// 	dir.append(*vec.begin());
 			
-				std::ifstream file(dir);
-				std::stringstream buffer;
-				buffer << file.rdbuf();
-				client.insertRespond(buffer.str());
-			}
+			// 	std::ifstream file(dir);
+			// 	std::stringstream buffer;
+			// 	buffer << file.rdbuf();
+			// 	client.insertRespond(buffer.str());
+			// }
 			/**
 			 * @brief 
 			 * 

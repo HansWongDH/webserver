@@ -10,12 +10,12 @@ enum {
 	DELETE = 3
 };
 
-#define ROOT "root";
+
 
 namespace ft{
 	class Request{
 		public:
-			Request();
+			Request(){};
 			~Request();
 			Request(string	header){
 				parse_header(header);
@@ -37,17 +37,24 @@ namespace ft{
 					method = 0;
 					throw std::invalid_argument("Invalid Method");
 				}
-				string root = ROOT;
-
 				ss >> target;
-				target = root + target;
+
 			}
 
+			string	getTarget(void) const
+			{
+				return this->target;
+			}
+
+			int		getMethod(void)
+			{
+				return this->method;
+			}
 		private:
 			int	method;
 			string target;
 			string body;
 
-	}
+	};
 }
 #endif
