@@ -1,5 +1,8 @@
-#include <iostream>
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
+#include <iostream>
+#
 namespace ft{
 	class Client {
 		public:
@@ -47,20 +50,22 @@ namespace ft{
 				return respond->empty();
 			}
 
-			void	insertRequest(char *buf, size_t size)
-			{
-				this->request->clear();
-				this->request->append(buf, size);
-				std::cout << this->request << std::endl;
-			}
+			// void	insertRequest(char *buf, size_t size)
+			// {
+			// 	this->request->clear();
+			// 	this->request->append(buf, size);
+			// 	std::cout << this->request << std::endl;
+			// }
 			
 
-			void	insertRespond(string buf)
-			{
-				this->respond->assign(buf.begin(), buf.end());
-			}
+			// void	insertRespond(string buf)
+			// {
+			// 	this->respond->assign(buf.begin(), buf.end());
+			// }
 			int	server_fd;
 			std::string	*request;
 			std::string *respond;
 	};
 }
+
+#endif

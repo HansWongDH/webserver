@@ -1,6 +1,7 @@
 #ifndef HTTPSERVER_HPP
 #define HTTPSERVER_HPP
 
+#define BUFFER_SIZE 200
 #include <vector>
 #include "Server.hpp"
 
@@ -114,7 +115,7 @@ namespace ft
 				}
 			}
 
-			void	request_GET(ft::Client client, string key)
+			void	method_GET(ft::Client client, string key)
 			{
 				vector<string> vec = findServer(client.server_fd).getInfo().getLocationInfo(key, "index");
 				string dir = "root";
