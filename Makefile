@@ -4,7 +4,13 @@ SRC_DIR		= ./
 OBJ_DIR		= obj
 INC_DIR		= inc
 
-SRC_FILES	= main.cpp
+SRC_FILES	= main.cpp \
+				srcs/parser \
+				srcs/webserv \
+				srcs/webserv/client \
+				srcs/webserv/client/request \
+				srcs/webserv/client/response \
+				srcs/webserv/server \
 
 GCC 		= c++
 CFLAGS		= -Wall -Wextra -Werror
