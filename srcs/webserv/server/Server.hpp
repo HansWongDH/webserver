@@ -34,8 +34,8 @@ namespace ft
             ft::ServerInfo  getInfo(void);
 
         private:
-            ft::ServerInfo  info;
             ft::Socket      socket;
+            ft::ServerInfo  info;
     };
 }
 

@@ -14,8 +14,9 @@ namespace ft
 		public:
 			~Socket();
 			Socket();
-			Socket(int port, int backlog = 20);
-			Socket(int domain, int service, int protocol, int port, u_long interface, int backlog = 20);
+			Socket(int port);
+			Socket(int port, int backlog);
+			Socket(int domain, int service, int protocol, int port, u_long interface, int backlog);
 			
 			int	getConnection(void);
 			int	getFd(void);

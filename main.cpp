@@ -1,5 +1,5 @@
-#include "./Server/Server.hpp"
-#include "./Parser/Parser.hpp"
+#include "./srcs/webserv/server/Server.hpp"
+#include "./srcs/parser/Parser.hpp"
 #include "./includes/colour.h"
 #include <iostream>
 #include <vector>
@@ -16,14 +16,14 @@ int main(void)
 	file.open("./config/example.conf");
 	const char *temp[] = {"listen", "server_name", "root"};
 	std::vector<std::string> test(temp, temp + 3);
-	ft::Parser Parse(file, test);
+	ft::Parser parsed(file, test);
 
-	ft::HTTPServer	Serverlist(Parse.getHTTPServer());
+	ft::Webserv	WebServer(parsed.getWebserv());
 	vector<struct pollfd> fds;
 	char buf[BUFFER_SIZE];
 
 
-	for (ft::HTTPServer::iterator it = Serverlist.begin(); it != Serverlist.end(); it++)
+	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
 	{
 		struct pollfd tmp;
 		tmp.fd = it->second.getFd();
@@ -33,7 +33,7 @@ int main(void)
 
 	// for (vector<struct pollfd>::iterator it = fds.begin(); fds)
 
-	int server_size = Serverlist.size();
+	int server_size = WebServer.server_size();
 			bool connection = false;
 	// cout << " fds size is " << fds.size()  << endl;
 	while (1)
@@ -51,8 +51,8 @@ int main(void)
 					if (fds[i].revents & POLLIN)
 					{
 						struct pollfd tmp;
-						tmp.fd = Serverlist.findServer(fds[i].fd).getSocket().accept_connection();
-						Serverlist.insertClient(fds[i].fd, tmp.fd);
+						tmp.fd = WebServer.findServer(fds[i].fd).getSocket().accept_connection();
+						WebServer.insertClient(fds[i].fd, tmp.fd);
 						tmp.events = POLLIN;
 						cout << CYAN "[INFO] Incoming connection connected to FD: " << fds[i].fd << " with client FD: " << tmp.fd <<  RESET << endl;
 						fds.push_back(tmp);
@@ -66,12 +66,12 @@ int main(void)
 						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
 						if (ret)
 						{
-							Serverlist.findClient(fds[i].fd).insertRequest(buf);
+							WebServer.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 				
-							// cout << Serverlist.findClient(fds[i].fd).getRequest();
+							// cout << WebServer.findClient(fds[i].fd).getRequest();
 							fds[i].events = POLLOUT;
-							// Serverlist.findClient(fds[i].fd).getRequest().clear();
+							// WebServer.findClient(fds[i].fd).getRequest().clear();
 						}
 						else
 							connection = true;
@@ -80,10 +80,10 @@ int main(void)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 					
-						std::cout << Serverlist.findClient(fds[i].fd).getRespond()->returnRespond() << std::endl;
+						std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
 						// write(fds[i].fd, buf , BUFFER_SIZE);
-						// std::cout << Serverlist.findClient(fds[i].fd).getRespond() << std::endl;
-						if (Serverlist.findClient(fds[i].fd).getRespond()->empty())
+						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
+						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
 						{
 							fds[i].events = POLLHUP;
 						}
@@ -92,8 +92,8 @@ int main(void)
 					if (fds[i].revents & POLLHUP || connection == true)
 					{
 						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
-						<< Serverlist.findServerfd(fds[i].fd) <<  RESET <<  endl;
-						Serverlist.eraseClient(fds[i].fd);
+						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
+						WebServer.eraseClient(fds[i].fd);
 						fds.erase(fds.begin() + i);
 						connection = false;
 					}

@@ -21,10 +21,10 @@ namespace ft
 			typedef ft::Client				client_type;
 			typedef	ft::Server				server_type;
 			typedef server_type&			server_reference;
-			typedef map<int, ft::Server>	servers;
-			typedef map<int, ft::Client>	clients;
-			typedef servers::iterator		servers_iterator;
-			typedef clients::iterator		clients_iterator;
+			typedef map<int, ft::Server>	servers_map;
+			typedef map<int, ft::Client>	clients_map;
+			typedef servers_map::iterator	servers_iterator;
+			typedef clients_map::iterator	clients_iterator;
 
 			Webserv();
 			~Webserv();
@@ -42,8 +42,8 @@ namespace ft
 			ft::Client			findClient(int client_fd);
 
 		private:
-			servers	servers;
-			clients	clients;
+			servers_map	servers;
+			clients_map	clients;
 	};
 }
 

@@ -29,6 +29,27 @@ ft::Socket::Socket()
  * @brief Construct a new Socket object
  * 
  * @param port Port to listen on
+ */
+ft::Socket::Socket(int port)
+{
+	/**
+	 * @brief defining address structure
+	 * The htons() function translates a short integer from host byte order to network byte order. 
+	 * The htonl() function translates a long integer from host byte order to network byte order.
+	 */
+	int domain = AF_INET;
+	int service = SOCK_STREAM;
+	int protocol = 0;
+	int backlog = 20;
+	int interface = INADDR_ANY;
+
+	setup(domain, service, protocol, port, interface, backlog);
+}
+
+/**
+ * @brief Construct a new Socket object
+ * 
+ * @param port Port to listen on
  * @param backlog Optional. Defaults to 20
  */
 ft::Socket::Socket(int port, int backlog = 20)

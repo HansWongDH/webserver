@@ -46,13 +46,14 @@ void	ft::Response::methodGet(ft::Request *request)
 
 void	ft::Response::methodPost(ft::Request *request)
 {
-	
+	(void) request;
 }
 
 void	ft::Response::methodDelete(ft::Request *request)
 {
-	
+	(void) request;
 }
+
 char*	ft::Response::returnResponse(void)
 {
 	char *ret;
