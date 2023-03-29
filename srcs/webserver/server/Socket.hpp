@@ -18,14 +18,14 @@ namespace ft
 			Socket(int port, int backlog);
 			Socket(int domain, int service, int protocol, int port, u_long interface, int backlog);
 			
-			int	getConnection(void);
-			int	getFd(void);
+			int					getConnection(void);
+			int					getFd(void);
 			struct sockaddr_in	getAddress(void);
-			int accept_connection();
+			int					accept_connection();
 
 		private:
-			int	socket_fd;
-			int connection;
+			int					socket_fd;
+			int					connection;
 			struct sockaddr_in	address;
 
 			void setup(int domain, int service, int protocol, int port, u_long interface, int backlog);

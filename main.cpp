@@ -1,4 +1,4 @@
-#include "./srcs/webserv/server/Server.hpp"
+#include "./srcs/webserver/server/Server.hpp"
 #include "./srcs/parser/Parser.hpp"
 #include "./includes/colour.h"
 #include <iostream>

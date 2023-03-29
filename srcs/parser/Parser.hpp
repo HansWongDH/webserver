@@ -6,8 +6,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "../webserv/server/ServerInfo.hpp"
-#include "../webserv/Webserv.hpp"
+#include "../webserver/server/ServerInfo.hpp"
+#include "../webserver/Webserv.hpp"
 
 using std::string;
 using std::multimap;

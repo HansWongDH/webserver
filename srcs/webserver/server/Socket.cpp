@@ -160,6 +160,7 @@ void ft::Socket::setup(int domain, int service, int protocol, int port, u_long i
 	if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 	{
 		std::cerr << "\033[31m[ERROR]	\033[96mbind:	\033[0m" << strerror(errno) << std::endl;
+		std::cerr << "\033[31mport:	" << port << "\033[0m" << std::endl;
 		throw std::runtime_error("Failed to bind socket");
 	}
 
