@@ -1,9 +1,10 @@
-#include "./Server/Server.hpp"
-#include "./Parser/Parser.hpp"
+#include "./srcs/webserver/server/Server.hpp"
+#include "./srcs/parser/Parser.hpp"
 #include "./includes/colour.h"
 #include <iostream>
 #include <vector>
 #include <poll.h>
+#include <unistd.h>
 
 using std::cout;
 using std::endl;
@@ -15,14 +16,14 @@ int main(void)
 	file.open("./config/example.conf");
 	const char *temp[] = {"listen", "server_name", "root"};
 	std::vector<std::string> test(temp, temp + 3);
-	ft::Parser Parse(file, test);
+	ft::Parser parsed(file, test);
 
-	ft::HTTPServer	Serverlist(Parse.getHTTPServer());
+	ft::Webserv	WebServer(parsed.getWebserv());
 	vector<struct pollfd> fds;
-	char buf[3000];
+	char buf[BUFFER_SIZE];
 
 
-	for (ft::HTTPServer::iterator it = Serverlist.begin(); it != Serverlist.end(); it++)
+	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
 	{
 		struct pollfd tmp;
 		tmp.fd = it->second.getFd();
@@ -32,9 +33,9 @@ int main(void)
 
 	// for (vector<struct pollfd>::iterator it = fds.begin(); fds)
 
-	int server_size = Serverlist.size();
+	int server_size = WebServer.server_size();
 			bool connection = false;
-	cout << " fds size is " << fds.size()  << endl;
+	// cout << " fds size is " << fds.size()  << endl;
 	while (1)
 	{
 
@@ -50,8 +51,8 @@ int main(void)
 					if (fds[i].revents & POLLIN)
 					{
 						struct pollfd tmp;
-						tmp.fd = Serverlist.findServer(fds[i].fd).getSocket().accept_connection();
-						Serverlist.newClient(tmp.fd, fds[i].fd);
+						tmp.fd = WebServer.findServer(fds[i].fd).getSocket().accept_connection();
+						WebServer.insertClient(fds[i].fd, tmp.fd);
 						tmp.events = POLLIN;
 						cout << CYAN "[INFO] Incoming connection connected to FD: " << fds[i].fd << " with client FD: " << tmp.fd <<  RESET << endl;
 						fds.push_back(tmp);
@@ -59,22 +60,18 @@ int main(void)
 				}
 				else if (fds[i].revents != 0)
 				{
-					// if (fds[i].fd)
-					
-					// std::cout << "STDfds[i].revents << 
-			
 					if (fds[i].revents & POLLIN)
 					{
 				
-						int ret = read(fds[i].fd, buf, 3000);
+						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
 						if (ret)
 						{
+							WebServer.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
-							stringstream ss(buf);
-							std::string str;
-							ss >> str;
-							std::cout<< str << endl;
+				
+							// cout << WebServer.findClient(fds[i].fd).getRequest();
 							fds[i].events = POLLOUT;
+							// WebServer.findClient(fds[i].fd).getRequest().clear();
 						}
 						else
 							connection = true;
@@ -82,15 +79,21 @@ int main(void)
 					else if (fds[i].revents & POLLOUT)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
-						write(fds[i].fd, "HAHAHAHAHAHAHAAHAH", 19);
-						fds[i].events = POLLIN;
+					
+						std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
+						// write(fds[i].fd, buf , BUFFER_SIZE);
+						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
+						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
+						{
+							fds[i].events = POLLHUP;
+						}
 						// poll_length--;
 					}
 					if (fds[i].revents & POLLHUP || connection == true)
 					{
-						Serverlist.deleteClient(fds[i].fd);
 						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
-						<< Serverlist.findServerfd(fds[i].fd) <<  RESET <<  endl;
+						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
+						WebServer.eraseClient(fds[i].fd);
 						fds.erase(fds.begin() + i);
 						connection = false;
 					}

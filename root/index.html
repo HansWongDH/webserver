@@ -1,0 +1,423 @@
+HTTP /1.1 200 OK
+Content-Type	text/html;charset=UTF-16
+
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		*{
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		}
+
+		.flex{ display: flex }
+		.align-center{ align-items: center}
+		.justify-center{ justify-content: center }
+		.space-between { justify-content: space-between }
+		.flex-end { align-items: flex-end }
+		.column { flex-direction: column }
+		.grow{ flex-grow: 2}
+		.fs-12{ font-size: 12px; height: 12px }
+		.fs-14{ font-size: 14px; height: 14px }
+		.txt-lb{color: #89b4d6}
+		.spacing-half{ letter-spacing: -0.5px}
+		.txt-no-wrap { white-space: nowrap }
+		.relative { position: relative }
+		.w100 { width: 100%; }
+
+
+		body{
+		font-family: Calibri, Candara, Segoe, Geneva, Tahoma, Arial, sans-serif;
+		box-sizing: border-box;
+		background-color: #d3e0e9;
+		background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/1080%20CSGO%20menu.png');
+		background-size: cover;
+		}
+
+		nav
+		{
+		background: #182128;
+		background: -moz-linear-gradient(left,  #182128 0%, #353f48 20%, #353f48 80%, #182128 100%);
+		background: -webkit-linear-gradient(left,  #182128 0%,#353f48 20%,#353f48 80%,#182128 100%);
+		background: linear-gradient(to right,  #182128 0%,#353f48 20%,#353f48 80%,#182128 100%); */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#182128', endColorstr='#182128',GradientType=1 ); /* IE6-9 */
+		width: 100%;
+		color: #ffffff;
+		height: 50px;
+		-webkit-box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.4);
+		-moz-box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.4);
+		box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.4);
+		font-size: 0;
+		position: absolute;
+		top: 0;
+		left: 0;
+		}
+
+		.container{
+		padding-top: calc(15vh + 50px);
+		padding-left: 15vw;
+		padding-right: 15vw;
+		}
+
+		i{
+		font-size: 24px !important;
+		text-align: center;
+		}
+
+		.list__icon{
+		width: 64px;
+		height: 50px;
+		padding-top: 12px;
+		transition: background-color 0.2s;
+		cursor: pointer;
+		}
+
+		.list__item
+		{
+		cursor: pointer;
+		max-width: 235px;
+		border-right: 3px solid #23282e;
+		font-weight: 600;
+		height: 50px;
+		font-size: 20px;
+		transition: background-color 0.2s;
+		-webkit-box-shadow: inset 0px 3px 5px 0px rgba(78,87,94,0.5), inset 0px -3px 5px 0px rgba(78,87,94,0.5) ;
+		-moz-box-shadow: inset 0px 3px 5px 0px rgba(78,87,94,0.5), inset 0px -3px 5px 0px rgba(78,87,94,0.5);
+		box-shadow: inset 0px 3px 5px 0px rgba(78,87,94,0.5), inset 0px -3px 5px 0px rgba(78,87,94,0.5);
+		}
+
+		.list__item:first-of-type { border-left: 3px solid #23282e }
+		.list__item:hover { background-color: #5c6165 }
+		.list__icon:hover { background-color: #5c6165 }
+
+		.award-icon{
+		height: 32px;
+		width: 32px;
+		}
+
+		.friends{
+		width: 390px;
+		height: 500px;
+		background-color: rgba(26, 35, 45, 0.8);
+		margin-bottom: 20px;
+		margin-right: 30px;
+		}
+
+		.title{
+		color: #8eacca;
+		display: inline-block;
+		width: 50%;
+		margin: 0px;
+		margin-left: auto;
+		margin-right: auto;
+		}
+
+		.title{
+		font-weight: bold;
+		font-size: 18px;
+		}
+
+		.lobby{
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		height: 100%;
+		align-items: center;
+		box-shadow: inset 0px 2px 3px 0px rgba(78,87,94,0.5);
+		}
+
+		.total{
+		text-align: center;
+		display: flex;
+		background-color: #384857;
+		justify-content: center;
+		height: 100%;
+		align-items: center;
+		box-shadow: inset 2px 2px 3px 0px rgba(78,87,94,0.5), inset 0px -2px 3px 0px rgba(78,87,94,0.5);
+		}
+
+		.friends__list{
+		padding: 15px 0 0 20px
+		}
+
+		.friends__header{
+		height: 33px;
+		background-color: #252f38;
+		display: flex;
+		}
+
+		.friends__friend{
+		display: flex;
+		height: 60px;
+		align-content: center;
+		align-items: center;
+		}
+
+		.friends__text{
+		margin-left: 8px;
+		align-self: flex-start;
+		margin-top: 8px;
+		}
+
+		.friends__name{
+		margin: 0px;
+		font-size: 17px;
+		font-weight: 100;
+		letter-spacing: -0.5px;
+		line-height: 17px;
+		}
+
+		.friends__border{
+
+		background: -moz-linear-gradient(left,  rgba(0,0,0,1) 0%, rgba(0,0,0,1) 58%, rgba(0,0,0,0.62) 74%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+		background: -webkit-linear-gradient(left,  rgba(0,0,0,1) 0%,rgba(0,0,0,1) 58%,rgba(0,0,0,0.62) 74%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+		background: linear-gradient(to right,  rgba(0,0,0,1) 0%,rgba(0,0,0,1) 58%,rgba(0,0,0,0.62) 74%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 */
+		height: 1px;
+		width: calc(100% - 20px);
+		}
+
+		.friends__status{
+		font-size: 14px;
+		font-weight: 100;
+		margin-top: 1px;
+		}
+
+		.friends__avatar{
+		width: 46px;
+		height: 46px;
+		border: 3px solid #426782;
+		border-radius: 1px;
+		}
+
+		.shadow{
+		-webkit-box-shadow: 6px 6px 51px 2px rgba(0,0,0,0.53);
+		-moz-box-shadow: 6px 6px 51px 2px rgba(0,0,0,0.53);
+		box-shadow: 6px 6px 51px 2px rgba(0,0,0,0.53);
+		}
+
+		.shadow-alt{
+		-webkit-box-shadow: 0px 0px 4px 4px rgba(77,83,95,0.4);
+		-moz-box-shadow: 0px 0px 4px 4px rgba(77,83,95,0.4);
+		box-shadow: 0px 0px 4px 4px rgba(77,83,95,0.4);
+		}
+
+		.ad {
+		display: inline-block;
+		width: 361px;
+		height: 146px;
+		background-image: url("https://i.imgur.com/IbCz87t.png");
+		margin: 0 5px;
+		}
+
+		.advertising {
+		background-color: #2f3841;
+		max-width: 935px;
+		max-height: 174px;
+		padding: 10px;
+		}
+
+		.player__header{
+		position: relative;
+		z-index:  1;
+		padding:  8px 14px;
+		}
+
+		.player__avatar
+		{
+		width:  60px;
+		height: 60px;
+		border: 2px solid #7b7e83;
+		}
+
+		.player__name
+		{
+		color:          #FFFFFF;
+		font-weight:    500;
+		font-size:      18px;
+		margin-bottom:  5px;
+		letter-spacing: -1px;
+		}
+
+		.rank-text{
+		padding: 10px 0 2px 0;
+		}
+
+		.rank{
+		font-size: 14px;
+		letter-spacing: -0.2px;
+		color: #91aecc;
+		font-weight: 600;
+		}
+
+		.progress-bar{
+		background-color: #22272a;
+		height: 9px;
+		width: 100%;
+		border:1px solid #46525e;
+		}
+
+		.player{
+		background-color: #313b45;
+		width: 390px;
+		margin-bottom: 30px;
+		display: inline-block;
+		vertical-align: top;
+		height: 175px;
+		margin-right: 30px;
+		box-shadow: inset 2px 2px 5px 0px rgba(78,87,94,0.8),inset -2px -2px 5px 0px rgba(78,87,94,0.8);
+		}
+
+		.player__matches{
+		background-color: #242b33;
+		width: 100%;
+		height: 60px;
+		padding: 24px 12px;
+		box-shadow: inset -3px -3px 3px 0px rgba(78,87,94,0.6);
+		}
+
+		.rounds {
+		display: inline-block;
+		color: #89a4c1;
+		letter-spacing: -1px;
+		}
+
+		.news{
+		max-height: 500px;
+		max-width: 935px;
+		background-color: #303942;
+		}
+
+		.news__header {
+		color:            #8cbade;
+		background-color: #2e3740;
+		height:           34px;
+		padding-left:     12px;
+		font-size:        21px;
+		margin-bottom:    30px;
+		}
+
+		.news__content{
+		padding-left: 36px;
+		color: #9c9f96;
+		}
+	</style>
+</head>
+<body>
+<nav class="flex grow">
+	<ul class="nav__list flex grow justify-center">
+	  <i class="fa fa-home list__icon"></i>
+	  <li class="list__item flex grow justify-center align-center">PLAY</li>
+	  <li class="list__item flex grow justify-center align-center">INVENTORY</li>
+	  <li class="list__item flex grow justify-center align-center">WATCH</li>
+	  <li class="list__item flex grow justify-center align-center">AWARDS</li>
+	  <li class="list__item flex grow justify-center align-center">OPTIONS</li>
+	  <i class="list__icon material-icons">power_settings_new</i>
+	</ul>
+  </nav>
+  
+  <div class="container flex column grow align-center">
+	
+	<div class="flex grow space-between w100 wrap">
+	  <div class="player shadow-alt">
+		<div class="player__header shadow">
+		  <div class="flex">
+			<div class="flex column align-center">
+			  <img class="player__avatar" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/steam%20avatar%20codepen.jpg" />
+			  <img class="award-icon" style="margin-top: 4px; height: 36px; width: 36px;" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/Csgo-rank-level15.png">
+			</div>
+			<div class="flex column grow " style="margin-left: 8px;">
+			  <p class="player__name">John Glenn</p>
+			  <div class="flex">
+				<img class="award-icon" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/Csgo_weaponspecialist_medal1.png" />
+				<img class="award-icon" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/Csgo_combatskills_medal2.png" />
+			  </div>
+			  <div class="rank-text space-between flex flex-end txt-no-wrap">
+				<div class="flex">
+				  <p class="rank txt-lb spacing-half">Master Sergeant</p>
+				  <p class="fs-14 txt-lb spacing-half" style="margin-left: 8px;">Rank 15</p>
+				</div>
+				<p class="fs-12 txt-lb spacing-half">Rank 16 + Drop</p>
+			  </div>
+			  <div class="progress-bar"></div>
+			</div>
+		  </div>
+		</div>
+		<div class="player__matches flex space-between align-center">
+		  <p class="rounds">Competative Matches Won</p>
+  
+		  <span>
+			  <i class="rounds fa fa-trophy" style="font-size: 18px !important"></i>
+			  <p class="rounds">27</p>
+			</span>
+		</div>
+	  </div>
+	  <div class="advertising flex grow shadow-alt">
+		<img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/225473/CSGO%20Ad.png" />
+	  </div>
+	</div>
+	
+	<div class="flex grow space-between w100 wrap">
+	  <div class="friends shadow-alt">
+	<div class="friends__header shadow">
+	  <div class="total spacing-half grow txt-lb">Friends (33)</div>
+	  <div class="lobby spacing-half grow txt-lb">Public Lobbies</div>
+	</div>
+	<div class="friends__list">
+  
+	  <div class="friends__friend">
+		<img src="http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/58/58892d1173626e9b3d41afd3fd2e952d66b8ee8e_full.jpg" class="friends__avatar">
+		<div class="friends__text">
+		  <p class="friends__name txt-lb">Nicholas Cage</p>
+		  <p class="friends__status txt-lb">Online</p>
+		</div>
+	  </div>
+  
+	  <div class="friends__border"></div>
+  
+	  <div class="friends__friend">
+		<img src="http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/58/58892d1173626e9b3d41afd3fd2e952d66b8ee8e_full.jpg" class="friends__avatar">
+		<div class="friends__text">
+		  <p class="friends__name txt-lb">Nicholas Cage</p>
+		  <p class="friends__status txt-lb">Online</p>
+		</div>
+	  </div>
+	  <div class="friends__border"></div>
+	  <div class="friends__friend">
+		<img src="http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/58/58892d1173626e9b3d41afd3fd2e952d66b8ee8e_full.jpg" class="friends__avatar">
+		<div class="friends__text">
+		  <p class="friends__name txt-lb">Nicholas Cage</p>
+		  <p class="friends__status txt-lb">Online</p>
+		</div>
+	  </div>
+  
+	  <div class="friends__border"></div>
+  
+	  <div class="friends__friend">
+		<img src="http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/58/58892d1173626e9b3d41afd3fd2e952d66b8ee8e_full.jpg" class="friends__avatar">
+			<div class="friends__text">
+			  <p class="friends__name txt-lb">Nicholas Cage</p>
+			  <p class="friends__status txt-lb">Online</p>
+			</div>
+		  </div>
+  
+		  <div class="friends__border"></div>
+  
+		</div>
+  
+	  </div>
+	  <div class="news flex column grow shadow-alt">
+		<div class="news__header shadow">
+		  News
+		</div>
+		<div class="news__content">
+		  CS:GO's Winter Update 11 DEC 2015 Welcome to the CS:GO Winter Update, filled with holiday cheer. There's something for everyone, including a brand new pistol, a new weapon case, gameplay adjustments, the all-new Killer Replay feature, and more! Click
+		  <a href="#">here</a> for the release notes, or read on for more details. R8 Revolver
+		</div>
+	  </div>
+	</div>
+	
+  </div>
+</body>
+</html>
