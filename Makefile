@@ -1,60 +1,38 @@
-NAME		= webserv
+NAME        = webserv
 
-SRC_DIR		= ./
-OBJ_DIR		= obj
-INC_DIR		= inc
+SRC_DIR     = srcs
+OBJ_DIR     = obj
+INC_DIR     = includes
 
-SRC_FILES	= main.cpp
+SRC_FILES   = main.cpp \
+			$(shell find $(SRC_DIR) -name '*.cpp')
+OBJ_FILES   = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
-GCC 		= c++
-CFLAGS		= -Wall -Wextra -Werror
-C++FLAGS	= -std=c++98
-SANITIZE	= -fsanitize=address -g3
-RM			= rm -f
+GCC         = c++
+CFLAGS      = -Wall -Wextra -Werror
+C++FLAGS    = -std=c++98
+SANITIZE    = -fsanitize=address -g3
+RM          = rm -f
 
-OBJ_FILES	= $(addprefix , $(SRC_FILES:.c=.o))
+all:        $(NAME)
 
-all:		$(NAME)
-
-%.o:		$(SRC_DIR)/%.c
-	@mkdir -p obj
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
 	$(GCC) $(C++FLAGS) $(CFLAGS) -I $(INC_DIR) -c $< -o $@
 
-$(LIBFT):
-	make -C $(LIBFT_DIR)
+$(NAME):	$(OBJ_FILES)
+	$(GCC) $(C++FLAGS) -o $(NAME) $(OBJ_FILES) $(SANITIZE)
 
-$(MLX):
-	make -C $(MLX_DIR)
-
-${NAME}:	${LIBFT} $(MLX) ${OBJ_FILES} ${OBJ_BANNER}
-	${GCC}  $(C++FLAGS) -o ${NAME} ${OBJ_FILES} $(SANITIZE)
-
-test: $(NAME)
+test:	$(NAME)
 	./$(NAME)
 
-vector:
-				$(CXX) $(C++FLAGS) vector.cpp -o $(NAME)
-				./$(NAME)
-
-stack:
-				$(CXX) $(C++FLAGS) stack.cpp -o $(NAME)
-				./$(NAME)
-			
-map:
-				$(CXX) $(C++FLAGS) map.cpp -o $(NAME)
-				./$(NAME)
-
-set:
-				$(CXX) $(C++FLAGS) set.cpp -o $(NAME)
-				./$(NAME)
 clean:
-	$(RM) $(OBJ_DIR)/*
+	$(RM) -r $(OBJ_DIR)
 
-fclean:
+fclean:	clean
 	$(RM) $(NAME)
-	$(RM) $(OBJ_DIR)/*
 	$(RM) output.log
 
-re:			fclean all
+re:	fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:	all clean fclean re test vector stack map set
