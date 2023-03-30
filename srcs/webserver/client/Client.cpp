@@ -1,20 +1,20 @@
 #include "Client.hpp"
 
-ft::Client::Client(ft::ServerInfo info){
-	this->request = new ft::Request;
-	this->response = new ft::Response(info);
-}
+// ft::Client::Client(ft::ServerInfo info){
+// 	this->request = new ft::Request;
+// 	this->response = new ft::Response(info);
+// }
 
-ft::Client::Client(int server_fd, ft::ServerInfo info) : server_fd(server_fd) {
+ft::Client::Client(int server_fd, ft::ServerInfo* info) : server_fd(server_fd) {
 	this->request = new ft::Request;
 	this->response = new ft::Response(info);
 }
 
 ft::Client::~Client() {
-	if(this->request)
-		delete request;
-	if (this->response)
-		delete response;
+	// if(this->request)
+	// 	delete request;
+	// if (this->response)
+	// 	delete response;
 };
 			
 ft::Request*	ft::Client::getRequest() const {

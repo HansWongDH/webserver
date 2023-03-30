@@ -17,15 +17,18 @@ int main(void)
 	const char *temp[] = {"listen", "server_name", "root"};
 	std::vector<std::string> test(temp, temp + 3);
 	ft::Parser parsed(file, test);
-
 	ft::Webserv	WebServer(parsed.getWebserv());
+	// for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
+	// 	 std::cout << i++ << std::endl;
+	
 	vector<struct pollfd> fds;
 	char buf[BUFFER_SIZE];
-
 
 	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
 	{
 		struct pollfd tmp;
+		// std::cout << "HERE === " << i++ << std::endl;
+		it->second.getInfo()->printConfig();
 		tmp.fd = it->second.getFd();
 		tmp.events = POLLIN;
 		fds.push_back(tmp);
@@ -80,9 +83,10 @@ int main(void)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 					
-						std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
+						// std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
 						// write(fds[i].fd, buf , BUFFER_SIZE);
 						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
+						WebServer.findClient(fds[i].fd).getResponse()->returnResponse(fds[i].fd);
 						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
 						{
 							connection = true;

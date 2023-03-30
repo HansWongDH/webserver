@@ -14,7 +14,7 @@ namespace ft
 {
 	class Response{
 		public:
-			Response(ft::ServerInfo info);
+			Response(ft::ServerInfo* info);
 			~Response();
 
 			void	insertResponse(string infile);
@@ -22,11 +22,12 @@ namespace ft
 			void	methodGet(ft::Request *request);
 			void	methodPost(ft::Request *request);
 			void	methodDelete(ft::Request *request);
-			char*	returnResponse(void);
+			void	returnResponse(int fd);
+			string	headerGenerator(ft::Request *request);
 			bool	empty();
 
 		private:
-			ft::ServerInfo	info;
+			ft::ServerInfo	*info;
 			string			_response;
 			int				size;
 			char			*_return;

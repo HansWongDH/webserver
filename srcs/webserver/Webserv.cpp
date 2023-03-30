@@ -2,12 +2,18 @@
 
 ft::Webserv::Webserv() : servers(), clients() {}
 ft::Webserv::~Webserv(){}
-ft::Webserv::Webserv(const Webserv& other) : servers(other.servers), clients(other.clients)
+ft::Webserv::Webserv( const Webserv& other) : servers(other.servers), clients(other.clients)
 {
+	// for (servers_const_iterator it = other.servers.begin(); it != other.servers.end(); it++)
+	// 	it->second.getInfo().printConfig();
+
+
+
 }
 
 void	ft::Webserv::insertServer(int server_fd, server_type server)
 {
+	// ft::Server *serv = new ft::Server(server);
 	servers.insert(std::make_pair(server_fd, server));
 }
 

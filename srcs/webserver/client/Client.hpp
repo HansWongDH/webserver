@@ -9,8 +9,8 @@
 namespace ft{
 	class Client {
 		public:
-			Client(ft::ServerInfo info);
-			Client(int server_fd, ft::ServerInfo info);
+			// Client(ft::ServerInfo* info);
+			Client(int server_fd, ft::ServerInfo* info);
 			~Client();
 			
 			ft::Request			*getRequest() const;

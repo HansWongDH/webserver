@@ -24,6 +24,7 @@ namespace ft
 			typedef map<int, ft::Server>	servers_map;
 			typedef map<int, ft::Client>	clients_map;
 			typedef servers_map::iterator	servers_iterator;
+			typedef servers_map::const_iterator	servers_const_iterator;
 			typedef clients_map::iterator	clients_iterator;
 
 			Webserv();

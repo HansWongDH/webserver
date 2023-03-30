@@ -31,7 +31,7 @@ namespace ft
 			~Parser();
 
 			value_vector	getServerInfo();
-			servers_type	getWebserv() const;
+			servers_type	getWebserv();
 			void			readfile(ifstream &file);
 			void			searchServer(ifstream& file, value_type& store);
 			void			searchLocation(ifstream& file, value_type& store, string map_key);
@@ -39,7 +39,9 @@ namespace ft
 			void			endoflineCheck(string_type& config);
 			void			initalizeServer(int port, value_type block);
 			void			errorChecking(void);
-			
+			void			printerror(void) {
+				
+			}
 			private:
 				vector<string>	info;
 				value_vector	conf;

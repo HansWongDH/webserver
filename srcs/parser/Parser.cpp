@@ -16,7 +16,7 @@ ft::Parser::value_vector ft::Parser::getServerInfo()
 	return this->conf;
 }
 
-ft::Parser::servers_type	ft::Parser::getWebserv() const
+ft::Parser::servers_type	ft::Parser::getWebserv()
 {
 	return this->servers;
 }
@@ -140,7 +140,9 @@ void	ft::Parser::errorChecking(void)
 {
 	for (value_iterator it = conf.begin(); it != conf.end(); it++)
 	{
+		// it->printConfig();
 		checkPort(*it);
+
 		initalizeServer(it->getPortNo(), *it);
 	}
 }

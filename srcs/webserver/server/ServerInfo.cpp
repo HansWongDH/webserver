@@ -45,6 +45,8 @@ ft::ServerInfo::location_type	ft::ServerInfo::getLocation(void) const
 
 void	ft::ServerInfo::printConfig(void)
 {
+	if (this->config.empty())
+		std::cout << "THIS IS EMPTY U FUCKER" << std::endl;
 	printing(this->config);
 }
 
