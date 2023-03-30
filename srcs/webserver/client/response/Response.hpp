@@ -24,6 +24,7 @@ namespace ft
 			void	methodDelete(ft::Request *request);
 			void	returnResponse(int fd);
 			string	headerGenerator(ft::Request *request);
+			string 	fileOpen(ft::Request *request);
 			bool	empty();
 
 		private:

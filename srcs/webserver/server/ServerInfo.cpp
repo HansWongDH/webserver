@@ -89,7 +89,7 @@ ft::ServerInfo::value_type	ft::ServerInfo::getLocationInfo(const key_type &loc, 
 	it = location.find(loc);
 	if (it == location.end())
 	{
-		std::cout << "here 1" << std::endl;
+		std::cout << "here 1 === " << loc << std::endl;
 		throw std::out_of_range("Key not found");
 	}
 	return (getinfo(it->second, key));

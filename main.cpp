@@ -14,8 +14,8 @@ int main(void)
 {
 	std::ifstream file;
 	file.open("./config/example.conf");
-	const char *temp[] = {"listen", "server_name", "root"};
-	std::vector<std::string> test(temp, temp + 3);
+	const char *temp[] = {"listen", "server_name", "root", "404", "/favicon.ico"};
+	std::vector<std::string> test(temp, temp + 5);
 	ft::Parser parsed(file, test);
 	ft::Webserv	WebServer(parsed.getWebserv());
 	// for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
@@ -63,7 +63,16 @@ int main(void)
 				}
 				else if (fds[i].revents != 0)
 				{
-					if (fds[i].revents & POLLIN)
+					if (fds[i].revents & POLLHUP || connection == true)
+					{
+						// std::cout << "HERE2" << std::endl;
+						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
+						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
+						WebServer.eraseClient(fds[i].fd);
+						fds.erase(fds.begin() + i);
+						connection = false;
+					}
+					else if (fds[i].revents & POLLIN)
 					{
 				
 						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
@@ -93,16 +102,6 @@ int main(void)
 							fds[i].revents = POLLHUP;
 						}
 						// poll_length--;
-					}
-				
-					if (fds[i].revents & POLLHUP || connection == true)
-					{
-						// std::cout << "HERE2" << std::endl;
-						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
-						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
-						WebServer.eraseClient(fds[i].fd);
-						fds.erase(fds.begin() + i);
-						connection = false;
 					}
 				}
 			}
