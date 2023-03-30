@@ -69,11 +69,7 @@ int main(void)
 							WebServer.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 				
-<<<<<<< HEAD
-							cout << buf << endl;
-=======
 							// cout << WebServer.findClient(fds[i].fd).getRequest();
->>>>>>> main
 							fds[i].events = POLLOUT;
 							// WebServer.findClient(fds[i].fd).getRequest().clear();
 						}
@@ -84,16 +80,10 @@ int main(void)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 					
-<<<<<<< HEAD
-						write(fds[i].fd, Serverlist.findClient(fds[i].fd).getRespond()->returnRespond() , BUFFER_SIZE);
-						std::cout << Serverlist.findClient(fds[i].fd).getRespond()->getSize() << std::endl;
-						if (Serverlist.findClient(fds[i].fd).getRespond()->empty())
-=======
 						std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
 						// write(fds[i].fd, buf , BUFFER_SIZE);
 						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
 						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
->>>>>>> main
 						{
 							connection = true;
 							fds[i].revents = POLLHUP;
