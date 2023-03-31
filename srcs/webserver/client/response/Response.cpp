@@ -80,36 +80,38 @@ void	ft::Response::PrefererentialPrefixMatch(ft::Request *request)
 			{
 				root = *info->getLocationInfo(request->getPrefix(), "root").begin();
 			}
+			
 			catch(const std::exception& e)
 			{
 				std::cerr << e.what() << "root not found within" << request->getPrefix() << '\n';
 			}
 			try
 			{
-				index = info->getLocationInfo(request->getPrefix(), "index");
+				if (!(*info->getLocationInfo(request->getPrefix(), "autoindex").begin()).compare("on"))
+					auto_index = true;
 			}
 			catch(const std::exception& e)
+			{
+			}
+			if (auto_index == false)
 			{
 				try
 				{
-					index = info->getConfigInfo("index");
+					index = info->getLocationInfo(request->getPrefix(), "index");
 				}
 				catch(const std::exception& e)
 				{
-					std::cout <<"reach here "<< std::endl;
-					index.push_back("index.html");
+					try
+					{
+						index = info->getConfigInfo("index");
+					}
+					catch(const std::exception& e)
+					{
+						std::cout <<"reach here "<< std::endl;
+						index.push_back("index.html");
+					}
+					
 				}
-				
-			}
-			try
-			{
-				if (!(*info->getLocationInfo(request->getPrefix(), "autoindex").begin()).compare("on"))
-					auto_index = true;
-				auto_index = false;
-			}
-			catch(const std::exception& e)
-			{
-				auto_index = false;
 			}
 		}
 		catch(const std::exception& e)
@@ -138,6 +140,79 @@ vector<string>	ft::Response::errorPage(void)
 	return page;
 	
 }
+
+string	autoIndexGenerator(ft::Request *request)
+{
+	string path = "root" + request->getPrefix();
+	string response;
+   	vector<std::pair<string, int> > dir_contents;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(path.c_str())) != NULL) 
+	{
+        while ((ent = readdir(dir)) != NULL) 
+		{    
+                string file_path = path + ent->d_name;
+                struct stat sb;
+                stat(file_path.c_str(), &sb);
+                dir_contents.push_back(std::make_pair(ent->d_name, sb.st_size));
+        }
+        closedir(dir);
+	}
+
+    // Sort the directory contents alphabetically by name
+    // sort(dir_contents.begin(), dir_contents.end());
+
+    // Write the HTTP response
+
+    response = "<!DOCTYPE html>\n";
+    response += "<html>\n";
+    response += "<head>\n";
+    response += "<title>Index of " + path + "</title>\n";
+    response += "</head>\n";
+    response += "<body>\n";
+    response += "<h1>Index of " + path + "</h1>\n";
+    response += "<hr>\n";
+    response += "<table>\n";
+    response += "<thead>\n";
+    response += "<tr>\n";
+    response += "<th>Name</th>\n";
+    response += "<th>Size</th>\n";
+    response += "</tr>\n";
+    response += "</thead>\n";
+    response += "<tbody>\n";
+
+    for (vector<std::pair<string, int> >::const_iterator it = dir_contents.begin(); it != dir_contents.end(); ++it) {
+        response += "<tr>\n";
+        response += "<td><a href=\"" + request->getPrefix() + "/" +  it->first + "\">" +  it->first  + "</a></td>\n";
+        response += "<td>" + std::to_string(it->second) + "</td>\n";
+        response += "</tr>\n";
+    }
+
+    response += "</tbody>\n";
+    response += "</table>\n";
+    response += "<hr>\n";
+    response += "</body>\n";
+    response += "</html>\n";
+    return response;
+}
+
+string	defaultErrorPage(void)
+{
+	string response;
+	response = "<!DOCTYPE html>\n";
+    response += "<html>\n";
+    response += "<head>\n";
+	response += "<title>404 not found</title>";
+	response += "</head>\n";
+	response += "<body>\n";
+	response += "<h1> This is default error page </h1>\n";
+	response += "</body>\n";
+   	response += "</html>\n";
+
+	return response;
+}
+
 void ft::Response::methodGet(ft::Request *request)
 {
 	std::cout << request->getTarget() << std::endl;
@@ -172,12 +247,18 @@ void ft::Response::methodGet(ft::Request *request)
 	}
 	if (!file.is_open() || this->status_code == NOT_FOUND)
 	{
+		if (this->auto_index == true)
+		{
+			std::cout << "here? " << std::endl;
+			insertResponse(responseHeader(this->status_code).append(autoIndexGenerator(request)));
+		return;
+		}
 		this->status_code = 404;
 			if (!errorPage().empty())
 				file.open(root + "/" + errorPage().back());
 			if (!file.is_open() || errorPage().empty())
 			{
-				insertResponse(responseHeader(404).append("Error page not found"));
+				insertResponse(responseHeader(404).append(defaultErrorPage()));
 				return ;
 			}
 	}

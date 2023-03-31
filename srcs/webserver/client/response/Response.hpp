@@ -4,6 +4,8 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <dirent.h>
+#include <sys/stat.h>
 #include "../request/Request.hpp"
 #include "../../server/ServerInfo.hpp"
 #include "../../../../includes/colour.h"
