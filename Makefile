@@ -10,7 +10,7 @@ OBJ_FILES   = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 GCC         = c++
 CFLAGS      = -Wall -Wextra -Werror
-C++FLAGS    = -std=c++98
+# C++FLAGS    = -std=c++98
 SANITIZE    = -fsanitize=address -g3
 RM          = rm -f
 

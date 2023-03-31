@@ -37,8 +37,8 @@ namespace ft{
 		void			printConfig(void);
 		void			printing(config_type& con);
 		value_type		getConfigInfo(const key_type& key);
-		value_type		getinfo(config_type& conf, const key_type& key);
-		value_type		getLocationKey(void);
+		value_type		getinfo(const config_type& conf, const key_type& key);
+		config_type		getLocationKey(const key_type &key);
 		value_type		getLocationInfo(const key_type &loc, const key_type& key);
 		int				getPortNo(void);
 		location_type	getLocation(void);

@@ -19,12 +19,17 @@ namespace ft{
 			
 			void	parse_header(string header);
 			string	getTarget(void) const;
+			string	getPrefix(void) const;
 			int		getMethod(void);
 
 		private:
 			int		method;
-			string	target;
+			string	url;
+			string	prefix;
+			string	HTTPVersion;
 			string	body;
+
+			void	requestPrefix(void);
 	};
 }
 #endif

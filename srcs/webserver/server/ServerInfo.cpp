@@ -66,33 +66,25 @@ ft::ServerInfo::value_type	ft::ServerInfo::getConfigInfo(const key_type& key)
 	return (getinfo(this->config, key));
 }
 
-ft::ServerInfo::value_type	ft::ServerInfo::getinfo(config_type& conf, const key_type& key)
+ft::ServerInfo::value_type	ft::ServerInfo::getinfo(const config_type& conf, const key_type& key)
 {
-	config_iterator it;
-	it = conf.find(key);
-	if (it == conf.end())
+	if (conf.find(key) == conf.end())
 		throw std::out_of_range("Key not found");
-	return it->second;
+	return conf.find(key)->second;
 }
 
-ft::ServerInfo::value_type	ft::ServerInfo::getLocationKey(void)
+ft::ServerInfo::config_type	ft::ServerInfo::getLocationKey(const key_type& key)
 {
-	value_type	keyvector;
-	for (location_iterator it = location.begin(); it != location.end(); it++)
-		keyvector.push_back(it->first);
-	return keyvector;
+	if (location.find(key) == location.end())
+	{
+		throw std::out_of_range("Key not found");
+	}
+	return location.find(key)->second;
 }
 
 ft::ServerInfo::value_type	ft::ServerInfo::getLocationInfo(const key_type &loc, const key_type& key)
 {
-	location_iterator it;
-	it = location.find(loc);
-	if (it == location.end())
-	{
-		std::cout << "here 1 === " << loc << std::endl;
-		throw std::out_of_range("Key not found");
-	}
-	return (getinfo(it->second, key));
+	return (getinfo(getLocationKey(loc), key));
 }
 
 int	ft::ServerInfo::getPortNo(void)

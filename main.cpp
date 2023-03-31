@@ -14,7 +14,7 @@ int main(void)
 {
 	std::ifstream file;
 	file.open("./config/example.conf");
-	const char *temp[] = {"listen", "server_name", "root", "404", "/favicon.ico"};
+	const char *temp[] = {"listen", "server_name", "root", "index", "404"};
 	std::vector<std::string> test(temp, temp + 5);
 	ft::Parser parsed(file, test);
 	ft::Webserv	WebServer(parsed.getWebserv());

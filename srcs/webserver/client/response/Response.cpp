@@ -1,13 +1,11 @@
 #include "Response.hpp"
 
-ft::Response::Response(ft::ServerInfo *info) : info(info), _response(), size(0)
+ft::Response::Response(ft::ServerInfo *info) : info(info), _response(), size(0), root("root"), auto_index(false)
 {
-	_return = (char *)malloc(sizeof(char) * BUFFER_SIZE);
 }
 ft::Response::~Response()
 {
-	if (_return)
-		free(_return);
+
 }
 
 void ft::Response::insertResponse(string infile)
@@ -28,72 +26,164 @@ void ft::Response::parseResponse(ft::Request *request)
 		return;
 }
 
-string ft::Response::headerGenerator(ft::Request *request)
+string ft::Response::responseHeader(int status_code)
 {
-	(void)request;
+	string status;
+	
+	if (status_code == OK)
+		status = " 200 Ok";
+	else if (status_code == NOT_FOUND)
+		status = " 404 Not Found";
+	else if (status_code == METHOD_NOT_ALLOWED)
+		status = " 405 Method Not Allowed";
+	else if (status_code == PAYLOAD_TOO_LARGE)
+		status = " 413 Payload Too Large";
+	else if (status_code == MOVE_PERMANENTLY)
+		status = " 301 Move Permanently";
+	else if (status_code == TEMPORARY_REDIRECT)
+		status = " 307 Temporary Redirect";
+	else if (status_code == PERMANENTLY_REDIRECT)
+		status = " 308 Permanent Redirect";
 
-	return ("HTTP/1.1 200 OK \r\nContent-Type: */*\r\n\r\n");
+	return ("HTTP/1.1" + status + "\r\nContent-Type: */*\r\n\r\n");
 }
 
-// string ft::Response::fileOpen(ft::Request *request)
-// {
-// 	std::fstream file;
-// 	file.open(request->getTarget());
-// 	if (!file.is_open())
-
-// }
-
-vector<string>	splitUrl(string url)
+vector<string> splitUrl(string url)
 {
 	vector<string> ret;
 	string token;
 	stringstream ss(url);
-	while (getline(ss,token, '/'))
-		if (!token.empty())
-			ret.push_back(token);
+	while (getline(ss, token, '/'))
+		ret.push_back(token);
 	return ret;
+}
+
+/**
+ * @brief open direct url first
+ * Exact match: Nginx first looks for an exact match between the request URL and a configured location block. If it finds a match, it sends the request to the corresponding backend server.
+
+Preferential Prefix match: If no exact match is found, Nginx looks for a location block whose prefix matches the beginning of the request URL. If multiple location blocks have a matching prefix, Nginx chooses the one with the longest prefix.
+
+Regular expression match: If no prefix match is found, Nginx looks for a location block that matches the request URL using a regular expression.
+
+Default match: If no match is found, Nginx sends the request to the default server or displays a 404 error.	
+ * 
+ * @param request 
+ */
+
+void	ft::Response::PrefererentialPrefixMatch(ft::Request *request)
+{
+		try
+		{
+			info->getLocationKey(request->getPrefix());
+			try
+			{
+				root = *info->getLocationInfo(request->getPrefix(), "root").begin();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << "root not found within" << request->getPrefix() << '\n';
+			}
+			try
+			{
+				index = info->getLocationInfo(request->getPrefix(), "index");
+			}
+			catch(const std::exception& e)
+			{
+				try
+				{
+					index = info->getConfigInfo("index");
+				}
+				catch(const std::exception& e)
+				{
+					std::cout <<"reach here "<< std::endl;
+					index.push_back("index.html");
+				}
+				
+			}
+			try
+			{
+				if (!(*info->getLocationInfo(request->getPrefix(), "autoindex").begin()).compare("on"))
+					auto_index = true;
+				auto_index = false;
+			}
+			catch(const std::exception& e)
+			{
+				auto_index = false;
+			}
+		}
+		catch(const std::exception& e)
+		{
+			this->status_code = NOT_FOUND;
+		}
+		
+}
+
+vector<string>	ft::Response::errorPage(void)
+{
+	vector<string> page;
+	stringstream ss;
+	ss << this->status_code;
+
+	string status = ss.str();
+	std::cout<< status << std::endl;
+	try
+	{
+		page = info->getConfigInfo(status);
+	}
+	catch(const std::exception& e)
+	{
+		// std::cerr << "WHY KEY NOT FOUND?" << '\n';
+	}
+	return page;
+	
 }
 void ft::Response::methodGet(ft::Request *request)
 {
 	std::cout << request->getTarget() << std::endl;
-	string root = info->getConfigInfo("root").front();
+	try
+	{
+		root = info->getConfigInfo("root").front();
+	}
+	catch(const std::exception& e)
+	{
+	}
 	std::fstream file;
+	/*exact match*/
 	file.open(root + request->getTarget());
+	this->status_code = OK;
+	/*if failed, do prefix matching*/
 	if (!file.is_open())
 	{
-		std::cout << "I enter here with" << request->getTarget() << std::endl;
-		vector<string> content;
-		vector<string> url = splitUrl(request->getTarget());
 		
-		for (vector<string>::iterator it = url.begin(); it != url.end(); it++)
-			std::cout << *it << std::endl;
- 		if (url.size() == 1)
-			url.push_back("root");
-		content = info->getLocationInfo("/" + url[0], url[1]);
-
-		for (ft::ServerInfo::iterator it = content.begin(); it != content.end(); it++)
+		PrefererentialPrefixMatch(request);
+		std::cout << "preferential matching : " <<this->root << std::endl;
+		for (ft::ServerInfo::iterator it = index.begin(); it != index.end(); it++)
 		{
-			std::cout << root + "/" + url[0] + "/" + *it << std::endl;
-			// std::cout << "HEREREREREREREE ============ " << root + request->getTarget() + *it << std::endl;
-			file.open(root + "/" + url[0] + "/" + *it);
-			// if (request->getTarget().back() == '/')
-			// 	file.open(root + request->getTarget() + *it);
-			// else if (request->getTarget().front() == '/' && request->getTarget().front() != request->getTarget().back())
-			// 	file.open(root + request->getTarget() + "/" + *it);
-			// else 
-				// file.open(root + "/" + request->getTarget() + "/" + *it);
+			std::cout <<root + request->getPrefix() + "/" + *it << std::endl;
+			file.open(root + request->getPrefix() + "/" + *it);
 			if (file.is_open())
+			{
+				std::cout << " hi i am here" << std::endl;
+				this->status_code = OK;
 				break;
+			}
 		}
 	}
-		if (!file.is_open())
-			file.open(root + "/404.html");
-		string file_content((std::istreambuf_iterator<char>(file)),
-							std::istreambuf_iterator<char>());
-		insertResponse(file_content);
-		string tmp = headerGenerator(request);
-		tmp.append(file_content);
-		insertResponse(tmp);
+	if (!file.is_open() || this->status_code == NOT_FOUND)
+	{
+		this->status_code = 404;
+			if (!errorPage().empty())
+				file.open(root + "/" + errorPage().back());
+			if (!file.is_open() || errorPage().empty())
+			{
+				insertResponse(responseHeader(404).append("Error page not found"));
+				return ;
+			}
+	}
+	string file_content((std::istreambuf_iterator<char>(file)),
+						std::istreambuf_iterator<char>());
+	insertResponse(responseHeader(this->status_code).append(file_content));
 }
 void ft::Response::methodPost(ft::Request *request)
 {
