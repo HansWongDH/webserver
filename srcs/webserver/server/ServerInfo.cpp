@@ -73,6 +73,15 @@ ft::ServerInfo::value_type	ft::ServerInfo::getinfo(const config_type& conf, cons
 	return conf.find(key)->second;
 }
 
+int		ft::ServerInfo::getLocationCount(const key_type& key)
+{
+	return location.count(key);
+}
+
+int		ft::ServerInfo::getConfigCount(const key_type& key)
+{
+	return config.count(key);
+}
 ft::ServerInfo::config_type	ft::ServerInfo::getLocationKey(const key_type& key)
 {
 	if (location.find(key) == location.end())

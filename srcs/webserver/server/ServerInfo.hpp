@@ -39,13 +39,15 @@ namespace ft{
 		value_type		getConfigInfo(const key_type& key);
 		value_type		getinfo(const config_type& conf, const key_type& key);
 		config_type		getLocationKey(const key_type &key);
+		int				getLocationCount(const key_type& key);
 		value_type		getLocationInfo(const key_type &loc, const key_type& key);
 		int				getPortNo(void);
 		location_type	getLocation(void);
 		void			clear();
 		void			printLocation();
 		config_type		getConfig(void);
-		
+		int		getConfigCount(const key_type& key);
+			
 		private:
 			config_type		config;
 			location_type	location;
