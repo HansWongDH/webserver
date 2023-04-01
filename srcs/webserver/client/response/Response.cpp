@@ -1,4 +1,5 @@
 #include "Response.hpp"
+#include "helper.hpp"
 
 ft::Response::Response(ft::ServerInfo *info) : info(info), _response(), size(0), root("root"), auto_index(false)
 {
@@ -61,11 +62,10 @@ int	ft::Response::allowedMethod(ft::Request *request)
 }
 void ft::Response::parseResponse(ft::Request *request)
 {
-	int	code = allowedMethod(request);
-	if (code != OK)
+	this->status_code = allowedMethod(request);
+	if (this->status_code != OK)
 	{
-		this->status_code = code;
-		insertResponse(responseHeader(this->status_code).append(defaultErrorPage()));
+		insertResponse(responseHeader(this->status_code).append(errorPage()));
 		return;
 	}
 	else
@@ -104,6 +104,7 @@ string getStatus(int status_code)
 	}
 }
 
+
 string ft::Response::responseHeader(int status_code)
 {
 	return ("HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n\r\n");
@@ -128,12 +129,10 @@ Default match: If no match is found, Nginx sends the request to the default serv
 string ft::Response::prefererentialPrefixMatch(string url)
 {
 	if (info->getLocationCount(url))
-	{
 		return url;
-	}
 	else
 	{
-		std::cout << " I enter here w/ url ==== " << url << std::endl;
+		// std::cout << " I enter here w/ url ==== " << url << std::endl;
 		if (!url.find_last_of('/'))
 			return ("");
 		else
@@ -154,7 +153,8 @@ string ft::Response::prefererentialPrefixMatch(string url)
 			page = info->getConfigInfo(status);
 			for (vector<string>::iterator it = page.begin(); it!= page.end(); it++)
 			{
-				file.open(root + *it);
+				std::cout << "I am appending here" << ft::pathAppend(root, *it) << std::endl;
+				file.open(ft::pathAppend(root, *it));
 				if (file.is_open())
 					return (string((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>()));
 			}
@@ -162,9 +162,9 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		return defaultErrorPage();
 	}
 
-	string autoIndexGenerator(ft::Request * request)
+	string ft::Response::autoIndexGenerator(string prefix)
 	{
-		string path = "root" + request->getPrefix();
+		string path = ft::pathAppend(root, prefix);
 		string response;
 		vector<std::pair<string, int>> dir_contents;
 		DIR *dir;
@@ -206,7 +206,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		for (vector<std::pair<string, int>>::const_iterator it = dir_contents.begin(); it != dir_contents.end(); ++it)
 		{
 			response += "<tr>\n";
-			response += "<td><a href=\"" + request->getPrefix() + "/" + it->first + "\">" + it->first + "</a></td>\n";
+			response += "<td><a href=\"" + prefix + "/" + it->first + "\">" + it->first + "</a></td>\n";
 			response += "<td>" + std::to_string(it->second) + "</td>\n";
 			response += "</tr>\n";
 		}
@@ -237,6 +237,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 
 	void ft::Response::methodGet(ft::Request * request)
 	{
+					std::cout <<"here" << this->status_code << std::endl;
 		std::cout << "Target: " << request->getTarget() << std::endl;
 		try
 		{
@@ -247,11 +248,13 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		}
 		std::fstream file;
 		/*exact match*/
-		file.open(root + request->getTarget());
+			
+		file.open(ft::pathAppend(root,request->getTarget()));
 		/*if failed, do prefix matching*/
+
+		string prefix = prefererentialPrefixMatch(request->getTarget());
 		if (!file.is_open())
 		{
-			string prefix = prefererentialPrefixMatch(request->getTarget());
 			if(!prefix.empty())
 			{
 				if (!initalizeLocationConfig(prefix, "root").empty())
@@ -265,7 +268,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 				}
 				for (ft::ServerInfo::iterator it = index.begin(); it != index.end(); it++)
 				{
-					file.open(root + prefix + "/" + *it);
+					file.open(ft::pathAppend(root, prefix, *it));
 					if (file.is_open())
 					{
 						this->status_code = OK;
@@ -276,10 +279,13 @@ string ft::Response::prefererentialPrefixMatch(string url)
 			else
 				this->status_code = NOT_FOUND;
 		}
-		if (!file.is_open() || this->status_code != OK)
+		// std::cout << "current status code" << this->status_code << std::endl;
+		if (!file.is_open())
+			this->status_code = NOT_FOUND;
+		if (this->status_code != OK)
 		{
 			if (this->auto_index == true)
-				insertResponse(responseHeader(this->status_code).append(autoIndexGenerator(request)));
+				insertResponse(responseHeader(this->status_code).append(autoIndexGenerator(prefix)));
 			else
 				insertResponse(responseHeader(this->status_code).append(errorPage()));
 		}

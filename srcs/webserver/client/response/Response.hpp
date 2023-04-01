@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include "../request/Request.hpp"
 #include "../../server/ServerInfo.hpp"
 #include "../../../../includes/colour.h"
@@ -60,6 +61,7 @@ namespace ft
 			int	allowedMethod(ft::Request *request);
 			string	defaultErrorPage(void);
 			vector<string>	initalizeLocationConfig(string prefix, string value);
+			string autoIndexGenerator(string prefix);
 	};
 } // namespace ft
 
