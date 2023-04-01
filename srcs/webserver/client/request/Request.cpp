@@ -36,7 +36,6 @@ void	ft::Request::requestPrefix(void)
 	string::iterator it = url.begin();
 	while (it != url.end())
 	{
-		// std::cout << *it << std::endl;
 		if (*it == '/' && it != url.begin())
 			break;
 		it++;

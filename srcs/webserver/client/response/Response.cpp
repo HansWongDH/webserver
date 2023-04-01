@@ -80,11 +80,11 @@ void	ft::Response::PrefererentialPrefixMatch(ft::Request *request)
 			{
 				root = *info->getLocationInfo(request->getPrefix(), "root").begin();
 			}
-			
 			catch(const std::exception& e)
 			{
 				std::cerr << e.what() << "root not found within" << request->getPrefix() << '\n';
 			}
+
 			try
 			{
 				if (!(*info->getLocationInfo(request->getPrefix(), "autoindex").begin()).compare("on"))
@@ -93,24 +93,20 @@ void	ft::Response::PrefererentialPrefixMatch(ft::Request *request)
 			catch(const std::exception& e)
 			{
 			}
-			if (auto_index == false)
+			
+			try
+			{
+				index = info->getLocationInfo(request->getPrefix(), "index");
+			}
+			catch(const std::exception& e)
 			{
 				try
 				{
-					index = info->getLocationInfo(request->getPrefix(), "index");
+					index = info->getConfigInfo("index");
 				}
 				catch(const std::exception& e)
 				{
-					try
-					{
-						index = info->getConfigInfo("index");
-					}
-					catch(const std::exception& e)
-					{
-						std::cout <<"reach here "<< std::endl;
-						index.push_back("index.html");
-					}
-					
+					index.push_back("index.html");
 				}
 			}
 		}
@@ -215,7 +211,7 @@ string	defaultErrorPage(void)
 
 void ft::Response::methodGet(ft::Request *request)
 {
-	std::cout << request->getTarget() << std::endl;
+	std::cout << "Target: " <<  request->getTarget() << std::endl;
 	try
 	{
 		root = info->getConfigInfo("root").front();
@@ -232,10 +228,8 @@ void ft::Response::methodGet(ft::Request *request)
 	{
 		
 		PrefererentialPrefixMatch(request);
-		std::cout << "preferential matching : " <<this->root << std::endl;
 		for (ft::ServerInfo::iterator it = index.begin(); it != index.end(); it++)
 		{
-			std::cout <<root + request->getPrefix() + "/" + *it << std::endl;
 			file.open(root + request->getPrefix() + "/" + *it);
 			if (file.is_open())
 			{
@@ -245,22 +239,22 @@ void ft::Response::methodGet(ft::Request *request)
 			}
 		}
 	}
+
 	if (!file.is_open() || this->status_code == NOT_FOUND)
 	{
 		if (this->auto_index == true)
 		{
-			std::cout << "here? " << std::endl;
 			insertResponse(responseHeader(this->status_code).append(autoIndexGenerator(request)));
-		return;
+			return;
 		}
 		this->status_code = 404;
-			if (!errorPage().empty())
-				file.open(root + "/" + errorPage().back());
-			if (!file.is_open() || errorPage().empty())
-			{
-				insertResponse(responseHeader(404).append(defaultErrorPage()));
-				return ;
-			}
+		if (!errorPage().empty())
+			file.open(root + "/" + errorPage().back());
+		if (!file.is_open() || errorPage().empty())
+		{
+			insertResponse(responseHeader(404).append(defaultErrorPage()));
+			return ;
+		}
 	}
 	string file_content((std::istreambuf_iterator<char>(file)),
 						std::istreambuf_iterator<char>());
