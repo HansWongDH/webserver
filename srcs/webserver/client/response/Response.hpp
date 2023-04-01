@@ -1,11 +1,13 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 #include <iostream>
+#include <stdio.h>
 #include <sstream>
 #include <fstream>
 #include <string>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "../request/Request.hpp"
 #include "../../server/ServerInfo.hpp"
 #include "../../../../includes/colour.h"
@@ -14,12 +16,16 @@ using std::string;
 
 enum {
 	OK = 200,
+	CREATED = 201,
+	ACCEPTED = 202,
+	NO_CONTENT = 204,
 	METHOD_NOT_ALLOWED = 405,
 	NOT_FOUND = 404,
 	PAYLOAD_TOO_LARGE = 413,
 	MOVE_PERMANENTLY = 301,
 	TEMPORARY_REDIRECT = 307,
-	PERMANENTLY_REDIRECT = 308
+	PERMANENTLY_REDIRECT = 308,
+	INTERNAL_SERVER_ERROR = 500
 
 };
 namespace ft

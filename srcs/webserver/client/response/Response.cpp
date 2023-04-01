@@ -265,9 +265,50 @@ void ft::Response::methodPost(ft::Request *request)
 	(void)request;
 }
 
+bool isSubdirectory(const std::string& request_path) {
+	const std::string& root = "root";
+	char* root_dir = realpath(root.c_str(), NULL);
+
+    // Get the absolute path of the request
+    char* abs_path = realpath(request_path.c_str(), NULL);
+    if (abs_path == NULL) {
+        std::cerr << "Error resolving path " << request_path << std::endl;
+        return false;
+    }
+
+    // Check if the absolute path starts with the root directory path and is not the root directory itself
+    bool is_subdir = (strcmp(root_dir, abs_path) != 0) && (strncmp(root_dir, abs_path, strlen(root_dir)) == 0);
+    free(abs_path);
+    free(root_dir);
+    return is_subdir;
+}
+
 void ft::Response::methodDelete(ft::Request *request)
 {
-	(void)request;
+	std::cout << "Target: " <<  request->getTarget() << std::endl;
+	try
+	{
+		root = info->getConfigInfo("root").front();
+	}
+	catch(const std::exception& e)
+	{
+	}
+
+	// Ensure we dont allow someone to delete the root directory or go above & also check if file exists
+	std::string request_path = root + request->getTarget();
+	if (!isSubdirectory(request_path.c_str()) || access(request_path.c_str(), F_OK)) {
+		this->status_code = NOT_FOUND;
+		insertResponse(responseHeader(this->status_code).append("Not Found!"));
+		return ;
+	}
+	try {
+		remove(request_path.c_str());
+		this->status_code = OK;
+		insertResponse(responseHeader(this->status_code).append("Deleted!"));
+	} catch (const std::exception& e) {
+		this->status_code = INTERNAL_SERVER_ERROR;
+		insertResponse(responseHeader(this->status_code).append("Internal server error"));
+	}
 }
 
 void ft::Response::returnResponse(int fd)
