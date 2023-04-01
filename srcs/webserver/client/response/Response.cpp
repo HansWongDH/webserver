@@ -283,6 +283,58 @@ bool isSubdirectory(const std::string& request_path) {
     return is_subdir;
 }
 
+// Recursively delete all files and subdirectories under a given directory
+int delete_directory(const std::string& path) {
+    DIR* dir = opendir(path.c_str());
+    if (dir == NULL) {
+        // Failed to open directory
+        return 1;
+    }
+
+    dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        // Ignore '.' and '..' directories
+        if (std::string(entry->d_name) == "." || std::string(entry->d_name) == "..") {
+            continue;
+        }
+
+        std::string full_path = path + "/" + std::string(entry->d_name);
+
+        struct stat stat_buf;
+        if (lstat(full_path.c_str(), &stat_buf) == -1) {
+            // Failed to stat file or directory
+            continue;
+        }
+
+        if (S_ISDIR(stat_buf.st_mode)) {
+            // Recursively delete subdirectory
+            if (delete_directory(full_path) != 0) {
+                closedir(dir);
+                return 1;
+            }
+            if (rmdir(full_path.c_str()) != 0) {
+                closedir(dir);
+                return 1;
+            }
+        } else {
+            // Delete file
+            if (remove(full_path.c_str()) != 0) {
+                closedir(dir);
+                return 1;
+            }
+        }
+    }
+
+    closedir(dir);
+
+	// Delete directory itself
+    if (rmdir(path.c_str()) != 0) {
+        return 1;
+    }
+	
+    return 0;
+}
+
 void ft::Response::methodDelete(ft::Request *request)
 {
 	std::cout << "Target: " <<  request->getTarget() << std::endl;
@@ -301,13 +353,23 @@ void ft::Response::methodDelete(ft::Request *request)
 		insertResponse(responseHeader(this->status_code).append("Not Found!"));
 		return ;
 	}
-	try {
-		remove(request_path.c_str());
+	int result = remove(request_path.c_str());
+
+	if (result == 0) {
 		this->status_code = OK;
 		insertResponse(responseHeader(this->status_code).append("Deleted!"));
-	} catch (const std::exception& e) {
-		this->status_code = INTERNAL_SERVER_ERROR;
-		insertResponse(responseHeader(this->status_code).append("Internal server error"));
+	} else {
+		std::cerr << "Unable to delete file" << std::endl;
+		result = delete_directory(request_path);
+
+		if (result == 0) {
+			this->status_code = OK;
+			insertResponse(responseHeader(this->status_code).append("Deleted!"));
+		} else {
+			std::cerr << "Unable to delete dir" << std::endl;	
+			this->status_code = INTERNAL_SERVER_ERROR;
+			insertResponse(responseHeader(this->status_code).append("Internal server error"));
+		}
 	}
 }
 
