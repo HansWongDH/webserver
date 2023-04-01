@@ -14,38 +14,68 @@ void ft::Response::insertResponse(string infile)
 	this->size = infile.size();
 }
 
-void ft::Response::parseResponse(ft::Request *request)
+bool	ft::Response::allowedMethod(ft::Request *request)
 {
-	if (request->getMethod() == GET)
-		methodGet(request);
-	else if (request->getMethod() == POST)
-		methodPost(request);
-	else if (request->getMethod() == DELETE)
-		methodDelete(request);
+	vector<string>	allowed_method;
+	try
+	{
+		allowed_method = info->getLocationInfo(request->getPrefix(), "allow_methods");
+		for (vector<string>::iterator it = allowed_method.begin(); it != allowed_method.end(); it++)
+			if (!request->getMethod().compare(*it))
+				return true;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	return false;
+}
+void ft::Response::parseResponse(ft::Request *request)
+{	
+	if (allowedMethod(request) == false)
+	{
+		this->status_code = METHOD_NOT_ALLOWED;
+		insertResponse(responseHeader(this->status_code).append(defaultErrorPage()));
+		return ;
+	}
 	else
-		return;
+	{
+		if (request->getMethod() == "GET")
+			methodGet(request);
+		else if (request->getMethod() == "POST")
+			methodPost(request);
+		else if (request->getMethod() == "DELETE")
+			methodDelete(request);
+		else
+			return;
+	}
+}
+
+string getStatus(int status_code)
+{
+switch (status_code) {
+        case OK:
+            return " 200 Ok";
+        case NOT_FOUND:
+            return " 404 Not Found";
+        case METHOD_NOT_ALLOWED:
+            return " 405 Method Not Allowed";
+        case PAYLOAD_TOO_LARGE:
+            return " 413 Payload Too Large";
+        case MOVE_PERMANENTLY:
+            return " 301 Move Permanently";
+        case TEMPORARY_REDIRECT:
+            return " 307 Temporary Redirect";
+        case PERMANENTLY_REDIRECT:
+            return " 308 Permanent Redirect";
+        default:
+            return " 500 Internal Server Error";
+    }
 }
 
 string ft::Response::responseHeader(int status_code)
 {
-	string status;
-	
-	if (status_code == OK)
-		status = " 200 Ok";
-	else if (status_code == NOT_FOUND)
-		status = " 404 Not Found";
-	else if (status_code == METHOD_NOT_ALLOWED)
-		status = " 405 Method Not Allowed";
-	else if (status_code == PAYLOAD_TOO_LARGE)
-		status = " 413 Payload Too Large";
-	else if (status_code == MOVE_PERMANENTLY)
-		status = " 301 Move Permanently";
-	else if (status_code == TEMPORARY_REDIRECT)
-		status = " 307 Temporary Redirect";
-	else if (status_code == PERMANENTLY_REDIRECT)
-		status = " 308 Permanent Redirect";
-
-	return ("HTTP/1.1" + status + "\r\nContent-Type: */*\r\n\r\n");
+	return ("HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n\r\n");
 }
 
 vector<string> splitUrl(string url)
@@ -193,16 +223,16 @@ string	autoIndexGenerator(ft::Request *request)
     return response;
 }
 
-string	defaultErrorPage(void)
+string	ft::Response::defaultErrorPage(void)
 {
 	string response;
 	response = "<!DOCTYPE html>\n";
     response += "<html>\n";
     response += "<head>\n";
-	response += "<title>404 not found</title>";
+	response += "<title>This is default error page of" + getStatus(this->status_code) + "</title>";
 	response += "</head>\n";
 	response += "<body>\n";
-	response += "<h1> This is default error page </h1>\n";
+	response += "<h1>" + getStatus(this->status_code) + " </h1>\n";
 	response += "</body>\n";
    	response += "</html>\n";
 
@@ -387,7 +417,7 @@ void ft::Response::returnResponse(int fd)
 	else
 	{
 		size = 0;
-		write(fd, _response.c_str(), strlen(_response.c_str()) + 1);
+		write(fd, _response.c_str(), _response.size());
 		// std::cout << _response << std::endl;
 		std::cout << "CURRENT SIZE === " << this->size << std::endl;
 		_response.clear();

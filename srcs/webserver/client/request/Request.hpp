@@ -4,12 +4,6 @@
 #include <sstream>
 using std::string;
 
-enum {
-	GET = 1,
-	POST = 2,
-	DELETE = 3
-};
-
 namespace ft{
 	class Request{
 		public:
@@ -20,10 +14,10 @@ namespace ft{
 			void	parse_header(string header);
 			string	getTarget(void) const;
 			string	getPrefix(void) const;
-			int		getMethod(void);
+			string	getMethod(void);
 
 		private:
-			int		method;
+			string	method;
 			string	url;
 			string	prefix;
 			string	HTTPVersion;

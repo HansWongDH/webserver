@@ -57,6 +57,8 @@ namespace ft
 			
 			void	PrefererentialPrefixMatch(ft::Request *request);
 			vector<string>	errorPage(void);
+			bool	allowedMethod(ft::Request *request);
+			string	defaultErrorPage(void);
 	};
 } // namespace ft
 
