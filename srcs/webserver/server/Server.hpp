@@ -31,11 +31,11 @@ namespace ft
 
             ft::Socket      getSocket(void);
             int             getFd(void);
-            ft::ServerInfo*  getInfo(void);
+            ft::ServerInfo  getInfo(void);
 
         private:
             ft::Socket      socket;
-            ft::ServerInfo  *info;
+            ft::ServerInfo  info;
     };
 }
 

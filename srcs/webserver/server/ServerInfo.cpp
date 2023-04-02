@@ -16,6 +16,12 @@ ft::ServerInfo::ServerInfo(const ServerInfo& other)
 	this->location = other.location;
 }
 
+ft::ServerInfo&	ft::ServerInfo::operator=(const ServerInfo& other)
+{
+	this->config = other.config;
+	this->location = other.location;
+	return *this;
+}
 void	ft::ServerInfo::addConfig(key_type key, value_type value)
 {
 	config.insert(std::make_pair(key, value));

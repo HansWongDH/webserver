@@ -34,7 +34,7 @@ namespace ft
 {
 	class Response{
 		public:
-			Response(ft::ServerInfo* info);
+			Response(ft::ServerInfo info);
 			~Response();
 
 			void	insertResponse(string infile);
@@ -48,7 +48,7 @@ namespace ft
 			bool	empty();
 
 		private:
-			ft::ServerInfo	*info;
+			ft::ServerInfo	info;
 			string			_response;
 			int				size;
 			int				status_code;

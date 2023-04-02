@@ -28,7 +28,7 @@ int main(void)
 	{
 		struct pollfd tmp;
 		// std::cout << "HERE === " << i++ << std::endl;
-		it->second.getInfo()->printConfig();
+		it->second.getInfo().printConfig();
 		tmp.fd = it->second.getFd();
 		tmp.events = POLLIN;
 		fds.push_back(tmp);

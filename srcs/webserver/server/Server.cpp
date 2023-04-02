@@ -1,8 +1,8 @@
 #include "Server.hpp"
 
 ft::Server::Server() {}
-ft::Server::Server(int port, ft::ServerInfo serv): socket(port) {
-    this->info = new ft::ServerInfo(serv);
+ft::Server::Server(int port, ft::ServerInfo serv): socket(port), info(serv) {
+
 }
             
 ft::Server::~Server() {
@@ -25,7 +25,7 @@ int ft::Server::getFd(void)
     return this->socket.getFd();
 }
 
-ft::ServerInfo*  ft::Server::getInfo(void)
+ft::ServerInfo  ft::Server::getInfo(void)
 {
     return this->info;
 }

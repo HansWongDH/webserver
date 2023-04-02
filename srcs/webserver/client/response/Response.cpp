@@ -1,7 +1,7 @@
 #include "Response.hpp"
 #include "helper.hpp"
 
-ft::Response::Response(ft::ServerInfo *info) : info(info), _response(), size(0), root("root"), auto_index(false)
+ft::Response::Response(ft::ServerInfo info) : info(info), _response(), size(0), root("root"), auto_index(false)
 {
 }
 ft::Response::~Response()
@@ -28,14 +28,14 @@ vector<string> ft::Response::initalizeLocationConfig(string prefix, string value
 
 	try
 	{
-		ret = info->getLocationInfo(prefix, value);
+		ret = info.getLocationInfo(prefix, value);
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << value << " is not specified in " << prefix << " initalized with server config" << '\n';
 		try
 		{
-			ret = info->getConfigInfo(value);
+			ret = info.getConfigInfo(value);
 		}
 		catch (const std::exception &e)
 		{
@@ -128,7 +128,7 @@ Default match: If no match is found, Nginx sends the request to the default serv
 
 string ft::Response::prefererentialPrefixMatch(string url)
 {
-	if (info->getLocationCount(url))
+	if (info.getLocationCount(url))
 		return url;
 	else
 	{
@@ -148,9 +148,9 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		string status = ss.str();
 		std::fstream file;
 		std::cout << status << std::endl;
-		if (info->getConfigCount(status))
+		if (info.getConfigCount(status))
 		{
-			page = info->getConfigInfo(status);
+			page = info.getConfigInfo(status);
 			for (vector<string>::iterator it = page.begin(); it!= page.end(); it++)
 			{
 				std::cout << "I am appending here" << ft::pathAppend(root, *it) << std::endl;
@@ -241,7 +241,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		std::cout << "Target: " << request->getTarget() << std::endl;
 		try
 		{
-			root = info->getConfigInfo("root").front();
+			root = info.getConfigInfo("root").front();
 		}
 		catch (const std::exception &e)
 		{
@@ -387,7 +387,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 		std::cout << "Target: " << request->getTarget() << std::endl;
 		try
 		{
-			root = info->getConfigInfo("root").front();
+			root = info.getConfigInfo("root").front();
 		}
 		catch (const std::exception &e)
 		{

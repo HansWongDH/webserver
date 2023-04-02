@@ -28,6 +28,7 @@ namespace ft{
 		ServerInfo();
 		~ServerInfo();
 		ServerInfo(const ServerInfo& other);
+		ServerInfo&	operator=(const ServerInfo& other);
 
 		void			addConfig(key_type key, value_type value);
 		void			insertConfig(const config_type& other);
