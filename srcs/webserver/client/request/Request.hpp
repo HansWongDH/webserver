@@ -2,6 +2,7 @@
 #define REQUEST_HPP
 #include <iostream>
 #include <sstream>
+#include <map>
 using std::string;
 
 namespace ft{
@@ -11,7 +12,7 @@ namespace ft{
 			~Request();
 			Request(string	header);
 			
-			void	parse_header(string header);
+			void	parse_request(const string& raw_request);
 			string	getTarget(void) const;
 			string	getPrefix(void) const;
 			string	getMethod(void);
@@ -21,7 +22,11 @@ namespace ft{
 			string	url;
 			string	prefix;
 			string	HTTPVersion;
-			string	body;
+			string	version;
+			string	contentType;
+			std::map<string, string> headers;
+			std::map<string, string> body;
+			std::map<string, string> params;
 
 			void	requestPrefix(void);
 	};
