@@ -21,7 +21,6 @@ namespace ft{
 			string	method;
 			string	url;
 			string	prefix;
-			string	HTTPVersion;
 			string	version;
 			string	contentType;
 			std::map<string, string> headers;
