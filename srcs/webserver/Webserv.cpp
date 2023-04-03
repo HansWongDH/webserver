@@ -3,9 +3,10 @@
 ft::Webserv::Webserv() : servers(), clients() {}
 ft::Webserv::~Webserv(){}
 ft::Webserv::Webserv(char **env) : servers(), clients() {
+	// std::cout << RED "HERE" RESET << std::endl;
 	this->envs = charToMap(env);
 }
-ft::Webserv::Webserv( const Webserv& other) : servers(other.servers), clients(other.clients)
+ft::Webserv::Webserv( const Webserv& other) : servers(other.servers), clients(other.clients), envs(other.envs)
 {
 	// for (servers_const_iterator it = other.servers.begin(); it != other.servers.end(); it++)
 	// 	it->second.getInfo().printConfig();
@@ -91,13 +92,26 @@ ft::Webserv::env_map	ft::Webserv::charToMap(char **env)
 	for (int i = 0; env[i] != NULL; i++)
 	{
 		string tmp(env[i]);
-		envs.insert(std::make_pair(tmp.substr(0, tmp.find_first_of('=') - 1), tmp.substr(tmp.find_first_of('='))));
+		// std::cout << tmp.substr(0, tmp.find_first_of('=')) << " === " << tmp.substr(tmp.find_first_of('=') + 1) << std::endl;
+		envs.insert(std::make_pair(tmp.substr(0, tmp.find_first_of('=')), tmp.substr(tmp.find_first_of('=') + 1)));
 	}
 	return envs;
 }
 
+
+char**	ft::Webserv::mapToChar(env_map envs)
+{
+	char **env = new char *[envs.size() + 1];
+	int i = 0;
+	for (env_map::iterator it = envs.begin(); it != envs.end(); it++, i++)
+		env[i] = strdup((it->first + "=" + it->second).c_str());
+	env[i] = NULL;
+	return env;
+}
+
 void	ft::Webserv::printEnv(void)
 {
+	// std::cout << envs.empty() << std::endl;
 	for (map<string, string>::iterator it = envs.begin(); it != envs.end(); it++)
 		std::cout << it->first << " = " << it->second << std::endl;
 }

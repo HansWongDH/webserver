@@ -29,7 +29,6 @@ int main(int ac, char **av, char **env)
 	// 	 std::cout << i++ << std::endl;
 	
 	vector<struct pollfd> fds;
-	WebServer.printEnv();
 	char buf[BUFFER_SIZE];
 
 	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
