@@ -2,6 +2,9 @@
 
 ft::Webserv::Webserv() : servers(), clients() {}
 ft::Webserv::~Webserv(){}
+ft::Webserv::Webserv(char **env) : servers(), clients() {
+	this->envs = charToMap(env);
+}
 ft::Webserv::Webserv( const Webserv& other) : servers(other.servers), clients(other.clients)
 {
 	// for (servers_const_iterator it = other.servers.begin(); it != other.servers.end(); it++)
@@ -79,4 +82,22 @@ void	ft::Webserv::eraseClient(int client_fd)
 ft::Client	ft::Webserv::findClient(int client_fd)
 {
 	return clients.find(client_fd)->second;
+}
+
+ft::Webserv::env_map	ft::Webserv::charToMap(char **env)
+{
+	ft::Webserv::env_map envs;
+
+	for (int i = 0; env[i] != NULL; i++)
+	{
+		string tmp(env[i]);
+		envs.insert(std::make_pair(tmp.substr(0, tmp.find_first_of('=') - 1), tmp.substr(tmp.find_first_of('='))));
+	}
+	return envs;
+}
+
+void	ft::Webserv::printEnv(void)
+{
+	for (map<string, string>::iterator it = envs.begin(); it != envs.end(); it++)
+		std::cout << it->first << " = " << it->second << std::endl;
 }

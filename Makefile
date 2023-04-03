@@ -24,7 +24,7 @@ $(NAME):	$(OBJ_FILES)
 	$(GCC) $(C++FLAGS) -o $(NAME) $(OBJ_FILES) $(SANITIZE)
 
 test:	$(NAME)
-	./$(NAME)
+	./$(NAME) default.conf
 
 clean:
 	$(RM) -r $(OBJ_DIR)

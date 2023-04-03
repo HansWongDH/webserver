@@ -10,18 +10,26 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-int main(void)
-{
+int main(int ac, char **av, char **env)
+{	
+	
+	if (ac != 2)
+	{
+		throw std::invalid_argument("Too many arguments");
+	}
 	std::ifstream file;
-	file.open("./config/example.conf");
+	file.open(av[1]);
+	if (!file.is_open())
+		throw std::invalid_argument("Invalid config files");
 	const char *temp[] = {"listen", "allow_methods", "root", "index", "404"};
 	std::vector<std::string> test(temp, temp + 5);
-	ft::Parser parsed(file, test);
+	ft::Parser parsed(file, test, env);
 	ft::Webserv	WebServer(parsed.getWebserv());
 	// for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
 	// 	 std::cout << i++ << std::endl;
 	
 	vector<struct pollfd> fds;
+	WebServer.printEnv();
 	char buf[BUFFER_SIZE];
 
 	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
