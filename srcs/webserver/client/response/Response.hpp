@@ -24,7 +24,7 @@ enum {
 	METHOD_NOT_ALLOWED = 405,
 	NOT_FOUND = 404,
 	PAYLOAD_TOO_LARGE = 413,
-	MOVE_PERMANENTLY = 301,
+	MOVED_PERMANENTLY = 301,
 	TEMPORARY_REDIRECT = 307,
 	PERMANENTLY_REDIRECT = 308,
 	INTERNAL_SERVER_ERROR = 500
@@ -55,6 +55,7 @@ namespace ft
 			string			root;
 			vector<string>	index;
 			bool			auto_index;
+			bool			redirection;
 			
 			string	prefererentialPrefixMatch(string url);
 			string	errorPage(void);
@@ -62,6 +63,7 @@ namespace ft
 			string	defaultErrorPage(void);
 			vector<string>	initalizeLocationConfig(string prefix, string value);
 			string autoIndexGenerator(string prefix);
+			string pageRedirection(string target);
 	};
 } // namespace ft
 
