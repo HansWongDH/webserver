@@ -27,7 +27,7 @@ namespace ft
 			typedef	value_vector::iterator			value_iterator;
 			typedef ft::Webserv						servers_type;
 		
-			Parser(ifstream &file, string_type key);
+			Parser(ifstream &file, string_type key, char **env);
 			~Parser();
 
 			value_vector	getServerInfo();

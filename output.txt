@@ -1,0 +1,15 @@
+total 836
+-rw-r--r-- 1 hansdhwong hansdhwong    755 Apr  4 16:07 Makefile
+-rw-r--r-- 1 hansdhwong hansdhwong      0 Mar 21 13:47 README.md
+-rw-r--r-- 1 hansdhwong hansdhwong     85 Apr  2 15:41 TODO.md
+-rwxr-xr-x 1 hansdhwong hansdhwong  17136 Apr  4 17:37 a.out
+drwxr-xr-x 1 hansdhwong hansdhwong    512 Apr  4 16:05 config
+-rw-r--r-- 1 hansdhwong hansdhwong   1122 Apr  4 16:56 default.conf
+drwxr-xr-x 1 hansdhwong hansdhwong    512 Mar 31 23:10 includes
+-rw-r--r-- 1 hansdhwong hansdhwong   3524 Apr  4 16:07 main.cpp
+drwxr-xr-x 1 hansdhwong hansdhwong    512 Apr  2 19:02 obj
+-rw-r--r-- 1 hansdhwong hansdhwong      0 Apr  4 17:37 output.txt
+drwxr-xr-x 1 hansdhwong hansdhwong    512 Apr  2 00:16 root
+drwxr-xr-x 1 hansdhwong hansdhwong    512 Mar 31 23:10 srcs
+-rw-r--r-- 1 hansdhwong hansdhwong   2438 Apr  4 17:37 test.c
+-rwxr-xr-x 1 hansdhwong hansdhwong 817480 Apr  2 19:02 webserv

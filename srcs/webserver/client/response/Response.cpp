@@ -1,17 +1,18 @@
 #include "Response.hpp"
 #include "helper.hpp"
 
-ft::Response::Response(ft::ServerInfo info) : info(info), _response(), size(0), root("root"), auto_index(false), redirection(false)
+ft::Response::Response(ft::ServerInfo info, const map<string, string>& env) : info(info), _response(), size(0), root("root"), auto_index(false), redirection(false), env(env)
 {
 }
 ft::Response::~Response()
 {
 }
 
-void ft::Response::insertResponse(string infile)
+int ft::Response::insertResponse(string infile)
 {
 	this->_response = infile;
 	this->size = infile.size();
+	return this->size;
 }
 
 /**
@@ -102,6 +103,107 @@ string getStatus(int status_code)
 	default:
 		return " 500 Internal Server Error";
 	}
+}
+
+
+void	dynamicFree(char **argument)
+{
+	for (int i = 0; argument[i] != NULL; i++)
+	{
+		std::cout << argument[i] <<std::endl;
+		delete	argument[i];
+	}
+}
+
+char*	dynamicDup(string s)
+{
+	char *str = new char[s.length() + 1];
+	strcpy(str, s.c_str());
+	return str;
+}
+
+char**	mapToChar(map<string,string> envs)
+{
+	char **env = new char *[envs.size() + 1];
+	int i = 0;
+	for (map<string,string>::iterator it = envs.begin(); it != envs.end(); it++, i++)
+		env[i] = dynamicDup(it->first + "=" + it->second);
+	env[i] = NULL;
+	return env;
+}
+
+// string	paramToString(ft::Request *request)
+// {
+// 	string query;
+
+// 	map<string,string> params = request->getParams();
+
+// 	std::cout << RED << params.size() << RESET << std::endl;
+// 	for (map<string,string>::const_iterator it = params.begin(); it != params.end(); it++)
+// 	{
+// 		// std::cout << "HERE?" << it->first << it->second << std::endl;
+// 		query.append(it->first + "=" + it->second);
+// 		if (it++ != params.end())
+// 			query.append("&");
+// 	}
+// 	return query;
+// }
+
+int	ft::Response::executeCGI(string prefix, ft::Request *request)
+{
+	string	cgipath;
+	int		status;
+	// std::cout << RED "HERE1" RESET << std::endl;
+	try
+	{
+		cgipath = info.getLocationInfo(prefix, "fastcgi_pass").front();
+	}
+	catch(const std::exception& e)
+	{
+		this->status_code = 404;
+		return(insertResponse(responseHeader(this->status_code).append(errorPage())));
+	}
+	this->env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
+	int fd[2];
+	char buf[BUFFER_SIZE];
+	pipe(fd);
+	int	pid = fork();
+	if (pid == 0)
+	{
+		char **envs = mapToChar(this->env);
+		char **args = new char*[3];
+		args[0] = dynamicDup("/usr/bin/python3");
+		args[1] = dynamicDup(pathAppend(root, prefix, cgipath));
+		args[2] = NULL;
+
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		if (execve("/usr/bin/python3", args, envs) == -1)
+			exit(127);
+    }
+	else
+	{
+		waitpid(pid, &status, 0);
+		if (WEXITSTATUS(status) != 0)
+		{	this->status_code = 404;
+			return (insertResponse(responseHeader(404).append(errorPage())));
+		}
+		close(fd[1]);
+		string cgireturn;
+		while(read(fd[0], buf, BUFFER_SIZE) > 0)
+			cgireturn.append(string(buf));
+		close(fd[0]);
+		if (redirection == true)
+			this->status_code = 301;
+		else
+			this->status_code = 200;
+		return (insertResponse(responseHeader(this->status_code).append(cgireturn)));
+		
+	}
+	return (0);
+	// dynamicFree(envs);
+	// dynamicFree(args);
+
 }
 
 string ft::Response::responseHeader(int status_code)
@@ -283,6 +385,11 @@ void ft::Response::methodGet(ft::Request *request)
 			{
 				if (!initalizeLocationConfig(prefix, "autoindex").front().compare("on"))
 					this->auto_index = true;
+			}
+			if (!request->getQuery().empty())
+			{
+				executeCGI(prefix, request);
+				return;
 			}
 			for (ft::ServerInfo::iterator it = index.begin(); it != index.end(); it++)
 			{

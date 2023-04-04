@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <stdarg.h>
 #include "../request/Request.hpp"
 #include "../../server/ServerInfo.hpp"
@@ -34,10 +35,10 @@ namespace ft
 {
 	class Response{
 		public:
-			Response(ft::ServerInfo info);
+			Response(ft::ServerInfo info, const map<string,string>& env);
 			~Response();
 
-			void	insertResponse(string infile);
+			int	insertResponse(string infile);
 			void	parseResponse(ft::Request *request);
 			void	methodGet(ft::Request *request);
 			void	methodPost(ft::Request *request);
@@ -56,6 +57,7 @@ namespace ft
 			vector<string>	index;
 			bool			auto_index;
 			bool			redirection;
+			map<string, string>	env;
 			
 			string	prefererentialPrefixMatch(string url);
 			string	errorPage(void);
@@ -64,6 +66,7 @@ namespace ft
 			vector<string>	initalizeLocationConfig(string prefix, string value);
 			string autoIndexGenerator(string prefix);
 			string pageRedirection(string target);
+			int	executeCGI(string prefix, ft::Request *request);
 	};
 } // namespace ft
 

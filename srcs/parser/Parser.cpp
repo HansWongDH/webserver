@@ -1,6 +1,6 @@
 #include "Parser.hpp"
 
-ft::Parser::Parser(ifstream &file, string_type key) : info(key)
+ft::Parser::Parser(ifstream &file, string_type key, char **env) : info(key), servers(env)
 {
 	readfile(file);
 	errorChecking();
