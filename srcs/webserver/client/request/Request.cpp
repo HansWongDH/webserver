@@ -41,6 +41,17 @@ string	ft::Request::getQuery(void) const
 {
 	return this->query_string;
 }
+
+string	spaceConversion(string url)
+{
+	std::cout << "size before replacement :" << url.length() << std::endl;
+	while (url.find("%20") != string::npos)
+		url.replace(url.find("%20"), 3, " ");
+	std::cout << "after replacement" << url.c_str() << std::endl;
+	std::cout << "size after replacement :" << url.length() << std::endl;
+	return url;
+}
+
 void	ft::Request::parse_request(const std::string& raw_request) {
 	// Find first space character to separate method and URI
     size_t method_end = raw_request.find(' ');
@@ -61,7 +72,7 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 
     // Parse URI
     url = raw_request.substr(method_end + 1, uri_end - method_end - 1);
-
+	
     // Parse query string, if any
     size_t query_start = url.find('?');
     if (query_start != std::string::npos) {
@@ -77,10 +88,10 @@ void	ft::Request::parse_request(const std::string& raw_request) {
                 params[key] = value;
             }
         }
-		query_string = query;
-	for (std::map<string,string>::iterator it = params.begin(); it != params.end(); it++)
-		std::cout << "HERE?" << it->first << it->second << std::endl;
+		query_string = spaceConversion(query);
     }
+	url = spaceConversion(url);
+
 
 	// size_t query_start = url.find('?');
 	// if (query_start != std::string::npos) {
@@ -201,3 +212,9 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 
 	requestPrefix();
 }
+/**
+ * @brief convert %20 to space
+ * 
+ * @param url 
+ * @return string 
+ */

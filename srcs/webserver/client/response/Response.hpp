@@ -57,6 +57,8 @@ namespace ft
 			vector<string>	index;
 			bool			auto_index;
 			bool			redirection;
+			string			prefix;
+			string			target;
 			map<string, string>	env;
 			
 			string	prefererentialPrefixMatch(string url);

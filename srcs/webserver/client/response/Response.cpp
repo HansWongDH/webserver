@@ -48,9 +48,9 @@ vector<string> ft::Response::initalizeLocationConfig(string prefix, string value
 int ft::Response::allowedMethod(ft::Request *request)
 {
 	vector<string> allowed_method;
-	if (!prefererentialPrefixMatch(request->getTarget()).empty())
+	if (!prefererentialPrefixMatch(this->target).empty())
 	{
-		allowed_method = initalizeLocationConfig(request->getPrefix(), "allow_methods");
+		allowed_method = initalizeLocationConfig(this->prefix, "allow_methods");
 		for (vector<string>::iterator it = allowed_method.begin(); it != allowed_method.end(); it++)
 			if (!request->getMethod().compare(*it))
 				return OK;
@@ -63,6 +63,8 @@ int ft::Response::allowedMethod(ft::Request *request)
 }
 void ft::Response::parseResponse(ft::Request *request)
 {
+	this->prefix = prefererentialPrefixMatch(request->getTarget());
+	this->target = pageRedirection(request->getTarget());
 	this->status_code = allowedMethod(request);
 	if (this->status_code != OK)
 	{
@@ -262,7 +264,7 @@ string ft::Response::errorPage(void)
 
 string	ft::Response::pageRedirection(string target)
 {
-	string prefix = prefererentialPrefixMatch(target);
+	// string prefix = prefererentialPrefixMatch(target);
 	try
 	{
 		if (!info.getLocationInfo(prefix, "return").empty())
@@ -355,8 +357,8 @@ string ft::Response::defaultErrorPage(void)
 
 void ft::Response::methodGet(ft::Request *request)
 {
-	std::cout << "here" << this->status_code << std::endl;
-	std::cout << "Target: " << request->getTarget() << std::endl;
+	// std::cout << "here" << this->status_code << std::endl;
+	// std::cout << "Target: " << request->getTarget() << std::endl;
 	try
 	{
 		root = info.getConfigInfo("root").front();
@@ -367,7 +369,7 @@ void ft::Response::methodGet(ft::Request *request)
 	std::fstream file;
 	/*exact match*/
 
-	string target = pageRedirection(request->getTarget());
+	// string target = pageRedirection(request->getTarget());
 	file.open(ft::pathAppend(root, target));
 	string prefix = prefererentialPrefixMatch(target);
 	/*if failed, do prefix matching*/
@@ -521,7 +523,7 @@ void ft::Response::methodDelete(ft::Request *request)
 	}
 
 	// Ensure we dont allow someone to delete the root directory or go above & also check if file exists
-	std::string request_path = root + request->getTarget();
+	std::string request_path = root + target;
 	if (!isSubdirectory(request_path.c_str()) || access(request_path.c_str(), F_OK))
 	{
 		this->status_code = NOT_FOUND;
