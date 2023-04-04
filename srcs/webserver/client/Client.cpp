@@ -5,9 +5,9 @@
 // 	this->response = new ft::Response(info);
 // }
 
-ft::Client::Client(int server_fd, ft::ServerInfo info) : server_fd(server_fd) {
+ft::Client::Client(int server_fd, ft::ServerInfo info, const map<string,string>& envs) : server_fd(server_fd) {
 	this->request = new ft::Request;
-	this->response = new ft::Response(info);
+	this->response = new ft::Response(info, envs);
 }
 
 ft::Client::~Client() {

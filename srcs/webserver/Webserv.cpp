@@ -69,7 +69,7 @@ int	ft::Webserv::findServerfd(int client_fd)
 
 void	ft::Webserv::insertClient(int server_id, int client_fd)
 {
-	ft::Client tmp(server_id, findServer(server_id).getInfo());
+	ft::Client tmp(server_id, findServer(server_id).getInfo(), envs);
 	
 	clients.insert(std::make_pair(client_fd, tmp));
 }
@@ -99,15 +99,7 @@ ft::Webserv::env_map	ft::Webserv::charToMap(char **env)
 }
 
 
-char**	ft::Webserv::mapToChar(env_map envs)
-{
-	char **env = new char *[envs.size() + 1];
-	int i = 0;
-	for (env_map::iterator it = envs.begin(); it != envs.end(); it++, i++)
-		env[i] = strdup((it->first + "=" + it->second).c_str());
-	env[i] = NULL;
-	return env;
-}
+
 
 void	ft::Webserv::printEnv(void)
 {

@@ -3,7 +3,7 @@
 ft::Request::Request() {};
 ft::Request::~Request() {};
 
-ft::Request::Request(string	header){
+ft::Request::Request(string	header) : query_string() {
 	parse_request(header);
 }
 
@@ -32,6 +32,15 @@ string		ft::Request::getMethod(void)
 	return this->method;
 }
 
+std::map<string, string>	ft::Request::getParams(void)
+{
+	return this->params;
+}
+
+string	ft::Request::getQuery(void) const
+{
+	return this->query_string;
+}
 void	ft::Request::parse_request(const std::string& raw_request) {
 	// Find first space character to separate method and URI
     size_t method_end = raw_request.find(' ');
@@ -68,7 +77,16 @@ void	ft::Request::parse_request(const std::string& raw_request) {
                 params[key] = value;
             }
         }
+		query_string = query;
+	for (std::map<string,string>::iterator it = params.begin(); it != params.end(); it++)
+		std::cout << "HERE?" << it->first << it->second << std::endl;
     }
+
+	// size_t query_start = url.find('?');
+	// if (query_start != std::string::npos) {
+	// 	this->query_string = url.substr(query_start + 1);
+	// 	 url = url.substr(0, query_start);
+	// }
 
     // Parse HTTP version
     version = raw_request.substr(uri_end + 1, raw_request.find('\r', uri_end) - uri_end - 1);
