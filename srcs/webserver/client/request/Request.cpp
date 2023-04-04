@@ -3,7 +3,7 @@
 ft::Request::Request() {};
 ft::Request::~Request() {};
 
-ft::Request::Request(string	header) : query_string() {
+ft::Request::Request(string	header) : query_string(), body_string() {
 	parse_request(header);
 }
 
@@ -42,13 +42,21 @@ string	ft::Request::getQuery(void) const
 	return this->query_string;
 }
 
+string	ft::Request::getBody(void) const
+{
+	return this->body_string;
+}
+
+/**
+ * @brief convert %20 to space
+ * 
+ * @param url 
+ * @return string 
+ */
 string	spaceConversion(string url)
 {
-	std::cout << "size before replacement :" << url.length() << std::endl;
 	while (url.find("%20") != string::npos)
 		url.replace(url.find("%20"), 3, " ");
-	std::cout << "after replacement" << url.c_str() << std::endl;
-	std::cout << "size after replacement :" << url.length() << std::endl;
 	return url;
 }
 
@@ -85,19 +93,12 @@ void	ft::Request::parse_request(const std::string& raw_request) {
             if (equals_sign != std::string::npos) {
                 std::string key = key_value_pair.substr(0, equals_sign);
                 std::string value = key_value_pair.substr(equals_sign + 1);
-                params[key] = value;
+                params[key] = spaceConversion(value);
             }
         }
 		query_string = spaceConversion(query);
     }
 	url = spaceConversion(url);
-
-
-	// size_t query_start = url.find('?');
-	// if (query_start != std::string::npos) {
-	// 	this->query_string = url.substr(query_start + 1);
-	// 	 url = url.substr(0, query_start);
-	// }
 
     // Parse HTTP version
     version = raw_request.substr(uri_end + 1, raw_request.find('\r', uri_end) - uri_end - 1);
@@ -144,22 +145,23 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 	if (raw_request.size() > body_start) {
 		if (headers.find("Content-Type") != headers.end() &&
 			headers["Content-Type"] == "application/x-www-form-urlencoded") {
-			std::string body_string = raw_request.substr(body_start);
-			std::istringstream body_iss(body_string);
+			std::string body_str = raw_request.substr(body_start);
+			std::istringstream body_iss(body_str);
 			std::string key_value_pair;
 			while (std::getline(body_iss, key_value_pair, '&')) {
 				size_t equals_sign = key_value_pair.find('=');
 				if (equals_sign != std::string::npos) {
 					std::string key = key_value_pair.substr(0, equals_sign);
 					std::string value = key_value_pair.substr(equals_sign + 1);
-					body[key] = value;
+					body[key] = spaceConversion(value);
 				}
 			}
+			body_string = spaceConversion(body_str);
 		} else if (headers["Content-Type"] == "application/json") {
 			// Parse JSON data in body
 			try {
-				std::string body_string = raw_request.substr(body_start);
-				std::istringstream iss(body_string);
+				std::string body_str = raw_request.substr(body_start);
+				std::istringstream iss(body_str);
 				std::stringstream ss;
 				ss << iss.rdbuf();
 
@@ -203,6 +205,9 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 					// Insert key-value pair into body map
 					body[key] = value;
 					pos = next_pos + 1;
+					if (body_string.length() > 0)
+						body_string += "&";
+					body_string += key + "=" + value;
 				}
 			} catch (...) {
 				throw std::runtime_error("Failed to parse JSON data");
@@ -212,9 +217,3 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 
 	requestPrefix();
 }
-/**
- * @brief convert %20 to space
- * 
- * @param url 
- * @return string 
- */

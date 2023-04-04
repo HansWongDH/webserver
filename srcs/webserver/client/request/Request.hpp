@@ -17,6 +17,7 @@ namespace ft{
 			string	getPrefix(void) const;
 			string	getMethod(void);
 			string	getQuery(void) const;
+			string	getBody(void) const;
 			std::map<string, string>	getParams(void);
 		private:
 			string	method;
@@ -24,7 +25,8 @@ namespace ft{
 			string	prefix;
 			string	version;
 			string	contentType;
-			string query_string;
+			string	query_string;
+			string	body_string;
 			std::map<string, string> headers;
 			std::map<string, string> body;
 			std::map<string, string> params;

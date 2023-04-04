@@ -166,6 +166,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		return(insertResponse(responseHeader(this->status_code).append(errorPage())));
 	}
 	this->env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
+	this->env.insert(std::make_pair("BODY_STRING", request->getBody()));
 	int fd[2];
 	char buf[BUFFER_SIZE];
 	pipe(fd);
@@ -247,13 +248,11 @@ string ft::Response::errorPage(void)
 
 	string status = ss.str();
 	std::fstream file;
-	std::cout << status << std::endl;
 	if (info.getConfigCount(status))
 	{
 		page = info.getConfigInfo(status);
 		for (vector<string>::iterator it = page.begin(); it != page.end(); it++)
 		{
-			std::cout << "I am appending here" << ft::pathAppend(root, *it) << std::endl;
 			file.open(ft::pathAppend(root, *it));
 			if (file.is_open())
 				return (string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()));
@@ -264,7 +263,6 @@ string ft::Response::errorPage(void)
 
 string	ft::Response::pageRedirection(string target)
 {
-	// string prefix = prefererentialPrefixMatch(target);
 	try
 	{
 		if (!info.getLocationInfo(prefix, "return").empty())
@@ -424,7 +422,14 @@ void ft::Response::methodGet(ft::Request *request)
 }
 void ft::Response::methodPost(ft::Request *request)
 {
-	(void)request;
+	string target = pageRedirection(request->getTarget());
+	string prefix = prefererentialPrefixMatch(target);
+	
+	if (!request->getQuery().empty())
+	{
+		executeCGI(prefix, request);
+		return;
+	}
 }
 
 bool isSubdirectory(const std::string &request_path)
