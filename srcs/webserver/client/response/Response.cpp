@@ -197,9 +197,9 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 			cgireturn.append(string(buf));
 		close(fd[0]);
 		if (redirection == true)
-			this->status_code = 301;
+			this->status_code = MOVED_PERMANENTLY;
 		else
-			this->status_code = 200;
+			this->status_code = OK;
 		return (insertResponse(responseHeader(this->status_code).append(cgireturn)));
 		
 	}
@@ -208,14 +208,61 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	// dynamicFree(args);
 
 }
+#include <random>
+
+tm* _generateExpirationTime(int expireTimeSeconds)
+{
+    time_t curr_time;
+    curr_time = time(NULL);
+
+    time_t expiry_time_t = curr_time + expireTimeSeconds;
+    tm *gmt_time = gmtime(&expiry_time_t);
+	return (gmt_time);
+}
+
+std::string _generateExpirationStr(tm *expiry_time)
+{
+	char	expiry_buf[32];
+
+	std::memset(expiry_buf, 0, sizeof(expiry_buf));
+    strftime(expiry_buf, sizeof(expiry_buf), "%a, %d %b %Y %H:%M:%S GMT", expiry_time);
+    return (std::string(expiry_buf));
+}
+
+std::string	_generateHash()
+{
+    std::string hash;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, 35);
+    const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    for (int i = 0; i < 32; i++)
+        hash += characters[distrib(gen)];
+	return (hash);
+}
+
+#include <sstream>
+
+std::string	generateCookie()
+{
+	std::string string;
+
+	string = "Cookie=" + _generateHash() + "; expires=" + _generateExpirationStr(_generateExpirationTime(30)) + ";"; 
+	return string;
+}
 
 string ft::Response::responseHeader(int status_code)
 {
-	return ("HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n\r\n");
+	string ret = "HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n";
+	if (status_code != OK)
+		return (ret + "\r\n");
+	else
+		return (ret + generateCookie() + "\r\n\r\n");
 }
 
 /**
- * @brief open direct url first
+ * @brief open direct url first 
  * Exact match: Nginx first looks for an exact match between the request URL and a configured location block. If it finds a match, it sends the request to the corresponding backend server.
 
 Preferential Prefix match: If no exact match is found, Nginx looks for a location block whose prefix matches the beginning of the request URL. If multiple location blocks have a matching prefix, Nginx chooses the one with the longest prefix.
@@ -587,4 +634,5 @@ bool ft::Response::empty()
 	if (size == 0)
 		return true;
 	return false;
+
 }
