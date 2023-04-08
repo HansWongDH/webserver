@@ -49,7 +49,7 @@ int main(int ac, char **av, char **env)
 	while (1)
 	{
 
-		if (poll(&fds[0], fds.size(), 100))
+		if (poll(&fds[0], fds.size(), 1000))
 		{
 			// cout << " fds revents is " <<  fds.data()->revents<< endl;
 			for (int i = 0; i < fds.size(); i++)
@@ -70,16 +70,7 @@ int main(int ac, char **av, char **env)
 				}
 				else if (fds[i].revents != 0)
 				{
-					if (fds[i].revents & POLLHUP || connection == true)
-					{
-						// std::cout << "HERE2" << std::endl;
-						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
-						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
-						WebServer.eraseClient(fds[i].fd);
-						fds.erase(fds.begin() + i);
-						connection = false;
-					}
-					else if (fds[i].revents & POLLIN)
+					if (fds[i].revents & POLLIN)
 					{
 				
 						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
@@ -109,6 +100,15 @@ int main(int ac, char **av, char **env)
 							fds[i].revents = POLLHUP;
 						}
 						// poll_length--;
+					}
+					if (fds[i].revents & POLLHUP || connection == true)
+					{
+						// std::cout << "HERE2" << std::endl;
+						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
+						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
+						WebServer.eraseClient(fds[i].fd);
+						fds.erase(fds.begin() + i);
+						connection = false;
 					}
 				}
 			}
