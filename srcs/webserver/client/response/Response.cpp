@@ -1,7 +1,7 @@
 #include "Response.hpp"
 #include "helper.hpp"
 
-ft::Response::Response(ft::ServerInfo info, const map<string, string>& env) : info(info), _response(), size(0), root("root"), auto_index(false), redirection(false), env(env)
+ft::Response::Response(ft::ServerInfo* info, const map<string, string>& env) : info(info), _response(), size(0), root("root"), auto_index(false), redirection(false), env(env)
 {
 }
 ft::Response::~Response()
@@ -29,14 +29,14 @@ vector<string> ft::Response::initalizeLocationConfig(string prefix, string value
 
 	try
 	{
-		ret = info.getLocationInfo(prefix, value);
+		ret = info->getLocationInfo(prefix, value);
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << value << " is not specified in " << prefix << " initalized with server config" << '\n';
 		try
 		{
-			ret = info.getConfigInfo(value);
+			ret = info->getConfigInfo(value);
 		}
 		catch (const std::exception &e)
 		{
@@ -61,8 +61,18 @@ int ft::Response::allowedMethod(ft::Request *request)
 	}
 	return METHOD_NOT_ALLOWED;
 }
+
+bool	ft::Response::checkCookie(ft::Request *request)
+{
+	string cookieHash = request->getCookie().second;
+	if (!cookieHash.empty())
+		return (info->findCookie("Cookie", cookieHash));
+	return false;
+}
+
 void ft::Response::parseResponse(ft::Request *request)
 {
+	this->cookie = checkCookie(request);
 	this->prefix = prefererentialPrefixMatch(request->getTarget());
 	this->target = pageRedirection(request->getTarget());
 	this->status_code = allowedMethod(request);
@@ -158,7 +168,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	// std::cout << RED "HERE1" RESET << std::endl;
 	try
 	{
-		cgipath = info.getLocationInfo(prefix, "fastcgi_pass").front();
+		cgipath = info->getLocationInfo(prefix, "fastcgi_pass").front();
 	}
 	catch(const std::exception& e)
 	{
@@ -238,27 +248,30 @@ std::string	_generateHash()
     const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     for (int i = 0; i < 32; i++)
+	{
         hash += characters[distrib(gen)];
+	}
 	return (hash);
 }
 
 #include <sstream>
 
-std::string	generateCookie()
+std::string	ft::Response::generateCookie()
 {
-	std::string string;
+	std::string hash;
 
-	string = "Cookie=" + _generateHash() + "; expires=" + _generateExpirationStr(_generateExpirationTime(30)) + ";"; 
-	return string;
+	hash = "Cookie=" + _generateHash();
+	info->insertCookie("Cookie", hash);
+	return hash + "; expires=" + _generateExpirationStr(_generateExpirationTime(30)) + ";"; ;
 }
 
 string ft::Response::responseHeader(int status_code)
 {
 	string ret = "HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n";
-	if (status_code != OK)
+	if (status_code != OK || cookie == true)
 		return (ret + "\r\n");
 	else
-		return (ret + generateCookie() + "\r\n\r\n");
+		return (ret + "Set-Cookie: " + generateCookie() + "\r\n\r\n");
 }
 
 /**
@@ -276,7 +289,7 @@ Default match: If no match is found, Nginx sends the request to the default serv
 
 string ft::Response::prefererentialPrefixMatch(string url)
 {
-	if (info.getLocationCount(url))
+	if (info->getLocationCount(url))
 		return url;
 	else
 	{
@@ -295,9 +308,9 @@ string ft::Response::errorPage(void)
 
 	string status = ss.str();
 	std::fstream file;
-	if (info.getConfigCount(status))
+	if (info->getConfigCount(status))
 	{
-		page = info.getConfigInfo(status);
+		page = info->getConfigInfo(status);
 		for (vector<string>::iterator it = page.begin(); it != page.end(); it++)
 		{
 			file.open(ft::pathAppend(root, *it));
@@ -312,10 +325,10 @@ string	ft::Response::pageRedirection(string target)
 {
 	try
 	{
-		if (!info.getLocationInfo(prefix, "return").empty())
+		if (!info->getLocationInfo(prefix, "return").empty())
 		{
 			std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
-			string redir = pathAppend(info.getLocationInfo(prefix, "return").front(), target.substr(target.find(prefix) + prefix.length()));
+			string redir = pathAppend(info->getLocationInfo(prefix, "return").front(), target.substr(target.find(prefix) + prefix.length()));
 			redirection = true;
 			std::cout << "Redirection exist, redirecting to " << redir << std::endl;
 			return redir;
@@ -406,7 +419,7 @@ void ft::Response::methodGet(ft::Request *request)
 	// std::cout << "Target: " << request->getTarget() << std::endl;
 	try
 	{
-		root = info.getConfigInfo("root").front();
+		root = info->getConfigInfo("root").front();
 	}
 	catch (const std::exception &e)
 	{
@@ -414,6 +427,8 @@ void ft::Response::methodGet(ft::Request *request)
 	std::fstream file;
 	/*exact match*/
 
+	// if (!request->getCookie().first.empty())
+	// 	std::cout << request->getCookie().first << request->getCookie().second << std::endl;
 	// string target = pageRedirection(request->getTarget());
 	file.open(ft::pathAppend(root, target));
 	string prefix = prefererentialPrefixMatch(target);
@@ -438,17 +453,16 @@ void ft::Response::methodGet(ft::Request *request)
 				executeCGI(prefix, request);
 				return;
 			}
-			for (ft::ServerInfo::iterator it = index.begin(); it != index.end(); it++)
+			if (cookie == true)
+				file.open(ft::pathAppend(root, prefix, index.front()));
+			else
+				file.open(ft::pathAppend(root, prefix, index.back()));
+			if (file.is_open())
 			{
-				file.open(ft::pathAppend(root, prefix, *it));
-				if (file.is_open())
-				{
-					if (redirection == false)
-						this->status_code = OK;
-					else
-						this->status_code = MOVED_PERMANENTLY;
-					break;
-				}
+				if (redirection == false)
+					this->status_code = OK;
+				else
+					this->status_code = MOVED_PERMANENTLY;
 			}
 		}
 		else
@@ -472,8 +486,10 @@ void ft::Response::methodPost(ft::Request *request)
 	string target = pageRedirection(request->getTarget());
 	string prefix = prefererentialPrefixMatch(target);
 	
-	if (!request->getQuery().empty())
+	if (!request->getBody().empty())
 	{
+		std::cout << "content" << request->getContentType();
+		std::cout << "body" << request->getBody() << std::endl;
 		executeCGI(prefix, request);
 		return;
 	}
@@ -568,7 +584,7 @@ void ft::Response::methodDelete(ft::Request *request)
 	std::cout << "Target: " << request->getTarget() << std::endl;
 	try
 	{
-		root = info.getConfigInfo("root").front();
+		root = info->getConfigInfo("root").front();
 	}
 	catch (const std::exception &e)
 	{

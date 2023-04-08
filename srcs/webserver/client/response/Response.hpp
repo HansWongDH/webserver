@@ -35,7 +35,7 @@ namespace ft
 {
 	class Response{
 		public:
-			Response(ft::ServerInfo info, const map<string,string>& env);
+			Response(ft::ServerInfo* info, const map<string,string>& env);
 			~Response();
 
 			int	insertResponse(string infile);
@@ -49,7 +49,7 @@ namespace ft
 			bool	empty();
 
 		private:
-			ft::ServerInfo	info;
+			ft::ServerInfo	*info;
 			string			_response;
 			int				size;
 			int				status_code;
@@ -57,6 +57,7 @@ namespace ft
 			vector<string>	index;
 			bool			auto_index;
 			bool			redirection;
+			bool			cookie;
 			string			prefix;
 			string			target;
 			map<string, string>	env;
@@ -69,6 +70,8 @@ namespace ft
 			string autoIndexGenerator(string prefix);
 			string pageRedirection(string target);
 			int	executeCGI(string prefix, ft::Request *request);
+			bool	checkCookie(ft::Request *request);
+			string	generateCookie();
 	};
 } // namespace ft
 

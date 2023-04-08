@@ -87,7 +87,7 @@ int main(int ac, char **av, char **env)
 						{
 							WebServer.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
-				
+							cout << BLUE << buf << RESET << endl;
 							// cout << WebServer.findClient(fds[i].fd).getRequest();
 							fds[i].events = POLLOUT;
 							// WebServer.findClient(fds[i].fd).getRequest().clear();

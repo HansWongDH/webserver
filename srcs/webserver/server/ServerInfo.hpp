@@ -48,10 +48,13 @@ namespace ft{
 		void			printLocation();
 		config_type		getConfig(void);
 		int		getConfigCount(const key_type& key);
+		void	insertCookie(const key_type& key, key_type value);
+		bool	findCookie(const key_type& key,  key_type value) const;
 			
 		private:
 			config_type		config;
 			location_type	location;
+			map<string, string> cookie;
 	};	
 }
 

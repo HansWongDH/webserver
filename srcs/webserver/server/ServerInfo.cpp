@@ -137,3 +137,16 @@ ft::ServerInfo::config_type	ft::ServerInfo::getConfig(void)
 	return this->config;
 }
 
+void	ft::ServerInfo::insertCookie(const key_type& key,key_type value)
+{
+	if (this->cookie.find(key) != this->cookie.end())
+		this->cookie.erase(key);
+	this->cookie.insert(std::make_pair(key, value));
+}
+
+bool	ft::ServerInfo::findCookie(const key_type& key, key_type value) const
+{
+	if (!this->cookie.find(key)->second.compare(value))
+		return true;
+	return false;
+}

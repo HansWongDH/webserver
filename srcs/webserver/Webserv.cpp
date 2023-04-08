@@ -69,7 +69,7 @@ int	ft::Webserv::findServerfd(int client_fd)
 
 void	ft::Webserv::insertClient(int server_id, int client_fd)
 {
-	ft::Client tmp(server_id, findServer(server_id).getInfo(), envs);
+	ft::Client tmp(server_id, findServer(server_id).getInfoAddress(), envs);
 	
 	clients.insert(std::make_pair(client_fd, tmp));
 }

@@ -18,7 +18,9 @@ namespace ft{
 			string	getMethod(void);
 			string	getQuery(void) const;
 			string	getBody(void) const;
+				string getContentType() const;
 			std::map<string, string>	getParams(void);
+			std::pair<const string, string> getCookie(void) const;
 		private:
 			string	method;
 			string	url;
@@ -27,6 +29,7 @@ namespace ft{
 			string	contentType;
 			string	query_string;
 			string	body_string;
+		
 			std::map<string, string> headers;
 			std::map<string, string> body;
 			std::map<string, string> params;

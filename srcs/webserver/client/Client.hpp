@@ -10,7 +10,7 @@ namespace ft{
 	class Client {
 		public:
 			// Client(ft::ServerInfo* info);
-			Client(int server_fd, ft::ServerInfo info, const map<string,string>& env);
+			Client(int server_fd, ft::ServerInfo* info, const map<string,string>& env);
 			~Client();
 			
 			ft::Request			*getRequest() const;
@@ -21,6 +21,7 @@ namespace ft{
 			int					server_fd;
 			ft::Request			*request;
 			ft::Response		*response;
+
 	};
 }
 

@@ -47,6 +47,13 @@ string	ft::Request::getBody(void) const
 	return this->body_string;
 }
 
+std::pair<const string, string> ft::Request::getCookie(void) const
+{
+	std::pair<const string, string> ret;
+	if (headers.find("Cookie") == headers.end())
+		return	std::make_pair("", "");
+	return *headers.find("Cookie");
+}
 /**
  * @brief convert %20 to space
  * 
@@ -143,6 +150,7 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 
     // Parse body, if any
 	if (raw_request.size() > body_start) {
+		body_string = spaceConversion(raw_request.substr(body_start));
 		if (headers.find("Content-Type") != headers.end() &&
 			headers["Content-Type"] == "application/x-www-form-urlencoded") {
 			std::string body_str = raw_request.substr(body_start);
@@ -216,4 +224,9 @@ void	ft::Request::parse_request(const std::string& raw_request) {
 	}
 
 	requestPrefix();
+}
+
+std::string ft::Request::getContentType (void) const
+{
+	return this->contentType;
 }
