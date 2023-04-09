@@ -72,24 +72,26 @@ int main(int ac, char **av, char **env)
 				{
 					if (fds[i].revents & POLLIN)
 					{
-				
-						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
-						if (ret)
+						int ret;
+						if ((ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0)) > 0)
 						{
 							WebServer.findClient(fds[i].fd).insertRequest(buf);
-							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 							cout << BLUE << buf << RESET << endl;
-							// cout << WebServer.findClient(fds[i].fd).getRequest();
-							fds[i].events = POLLOUT;
-							// WebServer.findClient(fds[i].fd).getRequest().clear();
+							cout << ret << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 						}
-						else
-							connection = true;
+						char *crlf_ptr = strstr(buf, "\r\n");
+						if (crlf_ptr != NULL)
+						{
+							WebServer.findClient(fds[i].fd).parseRequest();
+							fds[i].events = POLLOUT;
+						}
+						// else
+						// 	connection = true;
 					}
 					else if (fds[i].revents & POLLOUT)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
-					
+				
 						// std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
 						// write(fds[i].fd, buf , BUFFER_SIZE);
 						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
@@ -97,7 +99,6 @@ int main(int ac, char **av, char **env)
 						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
 						{
 							connection = true;
-							fds[i].revents = POLLHUP;
 						}
 						// poll_length--;
 					}

@@ -28,10 +28,13 @@ bool	ft::Client::responseEmpty()
 {
 	return response->empty();
 }
-
 void	ft::Client::insertRequest(char *buf)
 {
-	string tmp = buf;
-	request->parse_request(tmp);
+	string tmp(buf);
+	request->insertRequest(tmp);
+}
+void	ft::Client::parseRequest()
+{
+	request->parse_request();
 	response->parseResponse(this->request);
 }

@@ -4,7 +4,13 @@ ft::Request::Request() {};
 ft::Request::~Request() {};
 
 ft::Request::Request(string	header) : query_string(), body_string() {
-	parse_request(header);
+	std::cout << "HERE" << std::endl;
+	insertRequest(header);
+}
+
+void	ft::Request::insertRequest(const string& raw_request)
+{
+	this->_request.append(raw_request);
 }
 
 string	ft::Request::getPrefix(void) const
@@ -67,8 +73,10 @@ string	spaceConversion(string url)
 	return url;
 }
 
-void	ft::Request::parse_request(const std::string& raw_request) {
+void	ft::Request::parse_request() {
 	// Find first space character to separate method and URI
+	std::cout << this->_request << std::endl;
+	string raw_request = this->_request;
     size_t method_end = raw_request.find(' ');
     if (method_end == std::string::npos) {
         // Invalid request

@@ -12,7 +12,8 @@ namespace ft{
 			~Request();
 			Request(string	header);
 			
-			void	parse_request(const string& raw_request);
+			void	parse_request();
+			void	insertRequest(const string& raw_request);
 			string	getTarget(void) const;
 			string	getPrefix(void) const;
 			string	getMethod(void);
@@ -22,6 +23,7 @@ namespace ft{
 			std::map<string, string>	getParams(void);
 			std::pair<const string, string> getCookie(void) const;
 		private:
+			string	_request;
 			string	method;
 			string	url;
 			string	prefix;
