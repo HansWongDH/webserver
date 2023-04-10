@@ -16,9 +16,11 @@ namespace ft{
 			ft::Request			*getRequest() const;
 			ft::Response		*getResponse() const;
 			bool				responseEmpty();
-			void				parseRequest(void);
-			void				insertRequest(char *buf);
-			
+			void				parseHeader(int size);
+			void				parseBody(void);
+			void				insertBody(char *buf, int size);
+			void				insertHeader(char *buf, int size);
+			void				parseRespond();
 			int					server_fd;
 			ft::Request			*request;
 			ft::Response		*response;

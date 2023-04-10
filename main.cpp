@@ -29,7 +29,7 @@ int main(int ac, char **av, char **env)
 	// 	 std::cout << i++ << std::endl;
 	
 	vector<struct pollfd> fds;
-	char buf[BUFFER_SIZE];
+	
 
 	for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
 	{
@@ -68,33 +68,52 @@ int main(int ac, char **av, char **env)
 						fds.push_back(tmp);
 					}
 				}
-				else if (fds[i].revents != 0)
+				else
 				{
 					if (fds[i].revents & POLLIN)
 					{
+					
+						char buf[BUFFER_SIZE + 1];
 						int ret;
-						if ((ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0)) > 0)
+						ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
+						buf[ret] = 0;
+						cout << "return value of recv :" << ret << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
+						if (ret > 0)
 						{
-							WebServer.findClient(fds[i].fd).insertRequest(buf);
-							cout << BLUE << buf << RESET << endl;
-							cout << ret << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
+						
+							// string tmp = buf;
+							// cout << buf << endl;
+							// tmp.append(buf);
+							if (WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() == -1)
+							{
+								// std::cout << RED "Here 1" RESET<< endl;m
+								WebServer.findClient(fds[i].fd).insertHeader(buf,ret);
+								if (WebServer.findClient(fds[i].fd).getRequest()->findCarriage() == true)
+								{
+									WebServer.findClient(fds[i].fd).parseHeader(ret);
+									std::cout << RED "Here 2" RESET<< endl;
+								}
+							}
+							else
+							{
+								std::cout << RED "Here 3" RESET<< endl;
+								WebServer.findClient(fds[i].fd).insertBody(buf,ret);
+							}
+							std::cout << "Content length == " << WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() << std::endl;
+							if (WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() == 0)
+							{
+								WebServer.findClient(fds[i].fd).parseRespond();
+								fds[i].events = POLLOUT;
+							}
+							
 						}
-						char *crlf_ptr = strstr(buf, "\r\n");
-						if (crlf_ptr != NULL)
-						{
-							WebServer.findClient(fds[i].fd).parseRequest();
-							fds[i].events = POLLOUT;
-						}
-						// else
-						// 	connection = true;
+						else
+							 connection = true;
 					}
 					else if (fds[i].revents & POLLOUT)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 				
-						// std::cout << WebServer.findClient(fds[i].fd).getResponse()->returnResponse() << std::endl;
-						// write(fds[i].fd, buf , BUFFER_SIZE);
-						// std::cout << WebServer.findClient(fds[i].fd).getResponse() << std::endl;
 						WebServer.findClient(fds[i].fd).getResponse()->returnResponse(fds[i].fd);
 						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
 						{
@@ -104,7 +123,6 @@ int main(int ac, char **av, char **env)
 					}
 					if (fds[i].revents & POLLHUP || connection == true)
 					{
-						// std::cout << "HERE2" << std::endl;
 						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
 						<< WebServer.findServerfd(fds[i].fd) <<  RESET <<  endl;
 						WebServer.eraseClient(fds[i].fd);

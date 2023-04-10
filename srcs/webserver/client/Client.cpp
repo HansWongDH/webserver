@@ -28,13 +28,32 @@ bool	ft::Client::responseEmpty()
 {
 	return response->empty();
 }
-void	ft::Client::insertRequest(char *buf)
+void	ft::Client::insertHeader(char *buf, int size)
 {
 	string tmp(buf);
-	request->insertRequest(tmp);
+	std::cout << "Strlen of buf :" << strlen(buf) << " | size of string after conversion :" << tmp.size() << std::endl;
+	request->insertHeader(tmp, size);
 }
-void	ft::Client::parseRequest()
+
+void	ft::Client::parseRespond()
 {
-	request->parse_request();
+	response->parseResponse(this->request);
+}
+void	ft::Client::insertBody(char *buf, int size)
+{
+
+	string tmp(buf);
+	// std::cout << "HERERERERERE" << strlen(buf) << "|" << tmp.size() << std::endl;
+	request->insertBody(tmp, size);
+}
+
+void	ft::Client::parseHeader(int size)
+{
+	(void)size;
+	request->parseHeader();
+}
+void	ft::Client::parseBody()
+{
+	request->parseBody();
 	response->parseResponse(this->request);
 }

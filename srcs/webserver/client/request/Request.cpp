@@ -1,16 +1,32 @@
 #include "Request.hpp"
 
-ft::Request::Request() {};
+ft::Request::Request() : content_length(-1), raw_bytes(0) {};
 ft::Request::~Request() {};
 
-ft::Request::Request(string	header) : query_string(), body_string() {
-	std::cout << "HERE" << std::endl;
-	insertRequest(header);
+// ft::Request::Request(string	header) : query_string(), body_string() {
+// 	std::cout << "HERE" << std::endl;
+// }
+
+void	ft::Request::insertHeader(const string& raw_request, int size)
+{
+	this->raw_bytes += size;
+	this->_header.append(raw_request);
 }
 
-void	ft::Request::insertRequest(const string& raw_request)
+#include  <string.h>
+
+void	ft::Request::insertBody(const string& raw_request, int size)
 {
-	this->_request.append(raw_request);
+	this->_body.append(raw_request);
+	this->content_length -= size;
+}
+
+
+int	ft::Request::findCarriage(void) const
+{
+	if (this->_header.find("\r\n\r\n") != std::string::npos)
+		return true;
+	return false;
 }
 
 string	ft::Request::getPrefix(void) const
@@ -60,6 +76,11 @@ std::pair<const string, string> ft::Request::getCookie(void) const
 		return	std::make_pair("", "");
 	return *headers.find("Cookie");
 }
+
+int		ft::Request::getcontentLength(void) const
+{
+	return (this->content_length);
+}
 /**
  * @brief convert %20 to space
  * 
@@ -73,10 +94,12 @@ string	spaceConversion(string url)
 	return url;
 }
 
-void	ft::Request::parse_request() {
+void	ft::Request::parseHeader() {
 	// Find first space character to separate method and URI
-	std::cout << this->_request << std::endl;
-	string raw_request = this->_request;
+	string raw_request = this->_header;
+
+	this->_body = raw_request.substr(raw_request.find("\r\n\r\n") + 4);
+	// std::cout << "HERERERERE=== " << 	this->_header.size() << "herere" <<  size << "|||" <<this->_body.size() << std::endl;
     size_t method_end = raw_request.find(' ');
     if (method_end == std::string::npos) {
         // Invalid request
@@ -153,15 +176,30 @@ void	ft::Request::parse_request() {
         headers[header_name] = header_value;
     }
 
-    // Find start of body
-    size_t body_start = headers_end + 4;
+	if (headers.find("Content-Length") != headers.end())
+	{
+		std::stringstream ss(headers.find("Content-Length")->second);
+		ss >> this->content_length;
+	}
+	else
+	 	this->content_length = 0;
+
+	std::cout << "raw_bytes ===  " << raw_bytes << "content length === " << content_length << std::endl;
+	this->content_length -= (raw_bytes - (raw_request.find("\r\n\r\n") + 4));
+	
+}
+
+void	ft::Request::parseBody()
+{
+	// Find start of body
 
     // Parse body, if any
-	if (raw_request.size() > body_start) {
-		body_string = spaceConversion(raw_request.substr(body_start));
+	if (!this->_body.empty()) {
+		body_string = spaceConversion(this->_body);
+		std::string body_str = this->_body;
 		if (headers.find("Content-Type") != headers.end() &&
 			headers["Content-Type"] == "application/x-www-form-urlencoded") {
-			std::string body_str = raw_request.substr(body_start);
+
 			std::istringstream body_iss(body_str);
 			std::string key_value_pair;
 			while (std::getline(body_iss, key_value_pair, '&')) {
@@ -176,7 +214,6 @@ void	ft::Request::parse_request() {
 		} else if (headers["Content-Type"] == "application/json") {
 			// Parse JSON data in body
 			try {
-				std::string body_str = raw_request.substr(body_start);
 				std::istringstream iss(body_str);
 				std::stringstream ss;
 				ss << iss.rdbuf();
@@ -230,10 +267,7 @@ void	ft::Request::parse_request() {
 			}
 		}
 	}
-
-	requestPrefix();
 }
-
 std::string ft::Request::getContentType (void) const
 {
 	return this->contentType;

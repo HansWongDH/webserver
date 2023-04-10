@@ -12,18 +12,23 @@ namespace ft{
 			~Request();
 			Request(string	header);
 			
-			void	parse_request();
-			void	insertRequest(const string& raw_request);
+			void	parseHeader();
+			void	parseBody();
+			void	insertHeader(const string& raw_request, int size);
+			void	insertBody(const string& raw_request, int size);
+			int	findCarriage(void) const;
 			string	getTarget(void) const;
 			string	getPrefix(void) const;
 			string	getMethod(void);
 			string	getQuery(void) const;
 			string	getBody(void) const;
+			int		getcontentLength(void) const;
 				string getContentType() const;
 			std::map<string, string>	getParams(void);
 			std::pair<const string, string> getCookie(void) const;
 		private:
-			string	_request;
+			string	_header;
+			string	_body;
 			string	method;
 			string	url;
 			string	prefix;
@@ -31,6 +36,8 @@ namespace ft{
 			string	contentType;
 			string	query_string;
 			string	body_string;
+			int		content_length;
+			int		raw_bytes;
 		
 			std::map<string, string> headers;
 			std::map<string, string> body;
