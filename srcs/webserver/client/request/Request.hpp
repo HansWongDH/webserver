@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <fstream>
 using std::string;
 
 namespace ft{
@@ -18,7 +19,7 @@ namespace ft{
 			string	getMethod(void);
 			string	getQuery(void) const;
 			string	getBody(void) const;
-				string getContentType() const;
+			string getContentType() const;
 			std::map<string, string>	getParams(void);
 			std::pair<const string, string> getCookie(void) const;
 		private:

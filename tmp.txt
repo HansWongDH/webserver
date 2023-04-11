@@ -1,0 +1,41 @@
+----------------------------363658383082296504891417
+Content-Disposition: form-data; name="abc"; filename="exams"
+Content-Type: application/octet-stream
+
+fetch("https://admin.intra.42.fr/exams", {
+  "headers": {
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "accept-language": "en-GB,en;q=0.9",
+    "cache-control": "max-age=0",
+    "content-type": "application/x-www-form-urlencoded",
+    "sec-fetch-dest": "document",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "same-origin",
+    "sec-fetch-user": "?1",
+    "sec-gpc": "1",
+    "upgrade-insecure-requests": "1"
+  },
+  "referrer": "https://admin.intra.42.fr/exams/new",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": "utf8=%E2%9C%93&authenticity_token=%2FBf%2Fcfm3PAYSryEKQlVElyNWX1Patc81gKzy1qeQpstsWVJQp2xHSH+C6uUidjbAnB7l1fM9jRsMdGZkxROmTg==&exam%5Bbegin_at%5D=04%2F04%2F2023+00:00&exam%5Bend_at%5D=05%2F04%2F2023+00:00&exam%5Blocation%5D=42KL+Campus&exam%5Bip_range%5D=10.11.0.0%2F16,10.12.0.0%2F16,10.13.0.0%2F16,10.14.0.0%2F16&exam%5Bmax_people%5D=1&exam%5Bvisible%5D=0&exam%5Bvisible%5D=1&exam%5Bname%5D=DNS&exam%5Bcampus_id%5D=34&exam%5Bproject_ids%5D%5B%5D=&exam%5Bproject_ids%5D%5B%5D=1301&exam%5Bactivate_waitlist%5D=true&commit=Submit",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "include"
+});
+
+utf8:✓
+authenticity_token:/Bf/cfm3PAYSryEKQlVElyNWX1Patc81gKzy1qeQpstsWVJQp2xHSH+C6uUidjbAnB7l1fM9jRsMdGZkxROmTg::
+exam[begin_at]:04/04/2023 00:00
+exam[end_at]:05/04/2023 00:00
+exam[location]:42KL Campus
+exam[ip_range]:10.11.0.0/16,10.12.0.0/16,10.13.0.0/16,10.14.0.0/16
+exam[max_people]:1
+exam[visible]:0
+exam[visible]:1
+exam[name]:DNS
+exam[campus_id]:34
+exam[project_ids][]:
+exam[project_ids][]:1301
+exam[activate_waitlist]:true
+commit:Submit
+----------------------------363658383082296504891417--

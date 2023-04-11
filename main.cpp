@@ -51,6 +51,7 @@ int main(int ac, char **av, char **env)
 
 		if (poll(&fds[0], fds.size(), 1000))
 		{
+			cout << "Test" << endl;
 			// cout << " fds revents is " <<  fds.data()->revents<< endl;
 			for (int i = 0; i < fds.size(); i++)
 			{
@@ -73,14 +74,14 @@ int main(int ac, char **av, char **env)
 					if (fds[i].revents & POLLIN)
 					{
 				
-						int ret = read(fds[i].fd, buf, BUFFER_SIZE);
+						int ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
 						if (ret)
 						{
 							WebServer.findClient(fds[i].fd).insertRequest(buf);
 							cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 							cout << BLUE << buf << RESET << endl;
 							// cout << WebServer.findClient(fds[i].fd).getRequest();
-							fds[i].events = POLLOUT;
+							// fds[i].events = POLLOUT;
 							// WebServer.findClient(fds[i].fd).getRequest().clear();
 						}
 						else
@@ -97,7 +98,7 @@ int main(int ac, char **av, char **env)
 						if (WebServer.findClient(fds[i].fd).getResponse()->empty())
 						{
 							connection = true;
-							fds[i].revents = POLLHUP;
+							// fds[i].revents = POLLHUP;
 						}
 						// poll_length--;
 					}

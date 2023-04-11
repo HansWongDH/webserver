@@ -122,7 +122,7 @@ void	dynamicFree(char **argument)
 {
 	for (int i = 0; argument[i] != NULL; i++)
 	{
-		std::cout << argument[i] <<std::endl;
+		// std::cout << argument[i] <<std::endl;
 		delete	argument[i];
 	}
 }
@@ -143,23 +143,6 @@ char**	mapToChar(map<string,string> envs)
 	env[i] = NULL;
 	return env;
 }
-
-// string	paramToString(ft::Request *request)
-// {
-// 	string query;
-
-// 	map<string,string> params = request->getParams();
-
-// 	std::cout << RED << params.size() << RESET << std::endl;
-// 	for (map<string,string>::const_iterator it = params.begin(); it != params.end(); it++)
-// 	{
-// 		// std::cout << "HERE?" << it->first << it->second << std::endl;
-// 		query.append(it->first + "=" + it->second);
-// 		if (it++ != params.end())
-// 			query.append("&");
-// 	}
-// 	return query;
-// }
 
 int	ft::Response::executeCGI(string prefix, ft::Request *request)
 {
@@ -198,7 +181,8 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	{
 		waitpid(pid, &status, 0);
 		if (WEXITSTATUS(status) != 0)
-		{	this->status_code = 404;
+		{	
+			this->status_code = 404;
 			return (insertResponse(responseHeader(404).append(errorPage())));
 		}
 		close(fd[1]);
@@ -327,10 +311,10 @@ string	ft::Response::pageRedirection(string target)
 	{
 		if (!info->getLocationInfo(prefix, "return").empty())
 		{
-			std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
+			// std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
 			string redir = pathAppend(info->getLocationInfo(prefix, "return").front(), target.substr(target.find(prefix) + prefix.length()));
 			redirection = true;
-			std::cout << "Redirection exist, redirecting to " << redir << std::endl;
+			// std::cout << "Redirection exist, redirecting to " << redir << std::endl;
 			return redir;
 		}
 	}
@@ -488,8 +472,8 @@ void ft::Response::methodPost(ft::Request *request)
 	
 	if (!request->getBody().empty())
 	{
-		std::cout << "content" << request->getContentType();
-		std::cout << "body" << request->getBody() << std::endl;
+		// std::cout << "content" << request->getContentType();
+		// std::cout << "body" << request->getBody() << std::endl;
 		executeCGI(prefix, request);
 		return;
 	}
@@ -633,14 +617,14 @@ void ft::Response::returnResponse(int fd)
 		// std::cout << "tmp here" << tmp << "size === " << size << std::endl;
 		_response.erase(0, BUFFER_SIZE);
 		write(fd, tmp.c_str(), BUFFER_SIZE);
-		std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
 	}
 	else
 	{
 		size = 0;
 		write(fd, _response.c_str(), _response.size());
 		// std::cout << _response << std::endl;
-		std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
 		_response.clear();
 	}
 }

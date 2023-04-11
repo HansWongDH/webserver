@@ -7,8 +7,11 @@ query_string = os.environ.get("QUERY_STRING", "")
 params = {}
 if query_string:
     for pair in query_string.split("&"):
-        name, value = pair.split("=")
-        params[name] = value
+        try:
+            key, value = pair.split("=")
+            params[key] = value
+        except:
+            print("No pair")
 
 # Get the value of the "name" query params
 name = params.get("name", "")
@@ -18,8 +21,11 @@ body_string = os.environ.get("BODY_STRING", "")
 params = {}
 if body_string:
     for pair in body_string.split("&"):
-        key, value = pair.split("=")
-        params[key] = value
+        try:
+            key, value = pair.split("=")
+            params[key] = value
+        except:
+            print("No pair")
 
 # Get the value of the "name" query params
 username = params.get("username", "")

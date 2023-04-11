@@ -32,6 +32,6 @@ bool	ft::Client::responseEmpty()
 void	ft::Client::insertRequest(char *buf)
 {
 	string tmp = buf;
-	request->parse_request(tmp);
-	response->parseResponse(this->request);
+	// request->parse_request(tmp);
+	// response->parseResponse(this->request);
 }
