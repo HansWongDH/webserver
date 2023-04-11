@@ -73,7 +73,7 @@ int main(int ac, char **av, char **env)
 					if (fds[i].revents & POLLIN)
 					{
 					
-						char *buf = (char *)calloc(sizeof(char), BUFFER_SIZE);
+						char *buf = (char *)calloc(sizeof(char), BUFFER_SIZE + 1);
 						int ret;
 						ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
 						// buf[ret] = 0;
@@ -110,6 +110,7 @@ int main(int ac, char **av, char **env)
 						}
 						else
 							 connection = true;
+						free(buf);
 					}
 					else if (fds[i].revents & POLLOUT)
 					{

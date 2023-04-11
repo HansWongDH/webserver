@@ -166,6 +166,10 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	string	cgipath;
 	int		status;
 	// std::cout << RED "HERE1" RESET << std::endl;
+
+	std::string s;
+	std::stringstream out;
+	out << request->getcontentLength();
 	try
 	{
 		cgipath = info->getLocationInfo(prefix, "fastcgi_pass").front();
@@ -176,6 +180,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		return(insertResponse(responseHeader(this->status_code).append(errorPage())));
 	}
 	this->env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
+	this->env.insert(std::make_pair("SIZE", out.str()));
 	// this->env.insert(std::make_pair("BODY_STRING", request->getBody()));
 	int readfd[2];
 	int	writefd[2];
@@ -209,11 +214,11 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		{
 				std::cout << "Size === " << request->getRawbytes() << std::endl;
 			
-			if (request->getRawbytes() > 50000)
+			if (request->getRawbytes() > BUFFER_SIZE)
 			{
-				write(writefd[1], request->getBody().substr(0, 50000).c_str(), 50000);
-				request->setRawbytes(request->getRawbytes() - 50000);
-				request->getBody() = request->getBody().substr(50000);
+				write(writefd[1], request->getBody().substr(0, BUFFER_SIZE).c_str(), BUFFER_SIZE);
+				request->setRawbytes(request->getRawbytes() - BUFFER_SIZE);
+				request->getBody() = request->getBody().substr(BUFFER_SIZE);
 			}
 			else
 			{

@@ -30,9 +30,7 @@ bool	ft::Client::responseEmpty()
 }
 void	ft::Client::insertHeader(char *buf, int size)
 {
-	string tmp(buf);
-	std::cout << "Strlen of buf :" << strlen(buf) << " | size of string after conversion :" << tmp.size() << std::endl;
-	request->insertHeader(tmp, size);
+	request->insertHeader(string(buf, size), size);
 }
 
 void	ft::Client::parseRespond()
@@ -41,10 +39,7 @@ void	ft::Client::parseRespond()
 }
 void	ft::Client::insertBody(char *buf, int size)
 {
-
-	string tmp(buf);
-	// std::cout << "HERERERERERE" << strlen(buf) << "|" << tmp.size() << std::endl;
-	request->insertBody(tmp, size);
+	request->insertBody(string(buf, size), size);
 }
 
 void	ft::Client::parseHeader(int size)
