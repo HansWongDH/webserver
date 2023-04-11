@@ -73,14 +73,15 @@ int main(int ac, char **av, char **env)
 					if (fds[i].revents & POLLIN)
 					{
 					
-						char buf[BUFFER_SIZE + 1];
+						char *buf = (char *)calloc(sizeof(char), BUFFER_SIZE);
 						int ret;
 						ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
-						buf[ret] = 0;
+						// buf[ret] = 0;
 						cout << "return value of recv :" << ret << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 						if (ret > 0)
 						{
 						
+							std::cout << "SIZE OF BUFFER = " << string(buf).length() << std::endl;
 							// string tmp = buf;
 							// cout << buf << endl;
 							// tmp.append(buf);
@@ -100,7 +101,7 @@ int main(int ac, char **av, char **env)
 								WebServer.findClient(fds[i].fd).insertBody(buf,ret);
 							}
 							std::cout << "Content length == " << WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() << std::endl;
-							if (WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() == 0)
+							if (WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() == WebServer.findClient(fds[i].fd).getRequest()->getRawbytes())
 							{
 								WebServer.findClient(fds[i].fd).parseRespond();
 								fds[i].events = POLLOUT;

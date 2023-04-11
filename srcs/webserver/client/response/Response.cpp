@@ -188,7 +188,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		char **envs = mapToChar(this->env);
 		char **args = new char*[3];
 		args[0] = dynamicDup("/usr/bin/python3");
-		args[1] = dynamicDup(pathAppend(root, prefix, cgipath));
+		args[1] = dynamicDup(cgipath);
 		args[2] = NULL;
 	
 		dup2(readfd[1], STDOUT_FILENO);
@@ -197,23 +197,26 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		close(writefd[0]);
 		close(readfd[0]);
 		close(writefd[1]);
+		chdir(pathAppend(root, prefix).c_str());
 		if (execve("/usr/bin/python3", args, envs) == -1)
 			exit(127);
     }
 	else
 	{
-	
+		std::cout << pathAppend(root, prefix) << std::endl;
+
 		while (!request->getBody().empty())
 		{
+				std::cout << "Size === " << request->getRawbytes() << std::endl;
 			
-			if (request->getBody().size() > 50000)
+			if (request->getRawbytes() > 50000)
 			{
 				write(writefd[1], request->getBody().substr(0, 50000).c_str(), 50000);
-				request->eraseBody(0, 50000);
+				request->setRawbytes(request->getRawbytes() - 50000);
+				request->getBody() = request->getBody().substr(50000);
 			}
 			else
 			{
-				std::cout << "Size === " << request->getBody().size(); 
 				write(writefd[1], request->getBody().c_str(), request->getBody().size());
 				request->eraseBody(0, request->getBody().size());
 			}

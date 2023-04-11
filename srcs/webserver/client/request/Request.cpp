@@ -13,12 +13,22 @@ void	ft::Request::insertHeader(const string& raw_request, int size)
 	this->_header.append(raw_request);
 }
 
-#include  <string.h>
+
+int	ft::Request::getRawbytes()
+{
+	return this->raw_bytes;
+}
+
+void	ft::Request::setRawbytes(int size)
+{
+	this->raw_bytes = size;
+}
+// #include  <string.h>
 
 void	ft::Request::insertBody(const string& raw_request, int size)
 {
 	this->_body.append(raw_request);
-	this->content_length -= size;
+	this->raw_bytes += size;
 }
 
 
@@ -190,7 +200,8 @@ void	ft::Request::parseHeader() {
 	 	this->content_length = 0;
 
 	std::cout << "raw_bytes ===  " << raw_bytes << "content length === " << content_length << std::endl;
-	this->content_length -= (raw_bytes - (raw_request.find("\r\n\r\n") + 4));
+	raw_bytes -= raw_request.find("\r\n\r\n") + 4;
+	this->_body = raw_request.substr(raw_request.find("\r\n\r\n") + 4);
 	
 }
 
