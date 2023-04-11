@@ -66,9 +66,8 @@ string	ft::Request::getQuery(void) const
 
 string	ft::Request::getBody(void) const
 {
-	return this->body_string;
+	return this->_body;
 }
-
 std::pair<const string, string> ft::Request::getCookie(void) const
 {
 	std::pair<const string, string> ret;
@@ -94,6 +93,11 @@ string	spaceConversion(string url)
 	return url;
 }
 
+void	ft::Request::eraseBody(size_t pos, size_t size)
+{
+	this->_body.erase(pos, size);
+}
+
 void	ft::Request::parseHeader() {
 	// Find first space character to separate method and URI
 	string raw_request = this->_header;
@@ -105,6 +109,7 @@ void	ft::Request::parseHeader() {
         // Invalid request
         throw std::runtime_error("Invalid request line");
     }
+
 
     // Parse method
     method = raw_request.substr(0, method_end);

@@ -63,26 +63,27 @@ ft::Server	ft::Webserv::findServer(int	server_fd)
 
 int	ft::Webserv::findServerfd(int client_fd)
 {
-	return 	clients.find(client_fd)->second.server_fd;
+	return 	clients.find(client_fd)->second->server_fd;
 }
 
 
 void	ft::Webserv::insertClient(int server_id, int client_fd)
 {
-	ft::Client tmp(server_id, findServer(server_id).getInfoAddress(), envs);
+	ft::Client *tmp = new ft::Client(server_id, findServer(server_id).getInfoAddress(), envs);
 	
 	clients.insert(std::make_pair(client_fd, tmp));
 }
 
 void	ft::Webserv::eraseClient(int client_fd)
 {
+	delete &findClient(client_fd);
 	clients.erase(client_fd);
 	close(client_fd);
 }
 
-ft::Client	ft::Webserv::findClient(int client_fd)
+ft::Client&	ft::Webserv::findClient(int client_fd)
 {
-	return clients.find(client_fd)->second;
+	return *(clients.find(client_fd)->second);
 }
 
 ft::Webserv::env_map	ft::Webserv::charToMap(char **env)

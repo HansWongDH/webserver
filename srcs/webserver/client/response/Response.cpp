@@ -176,10 +176,12 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		return(insertResponse(responseHeader(this->status_code).append(errorPage())));
 	}
 	this->env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
-	this->env.insert(std::make_pair("BODY_STRING", request->getBody()));
-	int fd[2];
+	// this->env.insert(std::make_pair("BODY_STRING", request->getBody()));
+	int readfd[2];
+	int	writefd[2];
 	char buf[BUFFER_SIZE];
-	pipe(fd);
+	pipe(readfd);
+	pipe(writefd);
 	int	pid = fork();
 	if (pid == 0)
 	{
@@ -188,24 +190,47 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 		args[0] = dynamicDup("/usr/bin/python3");
 		args[1] = dynamicDup(pathAppend(root, prefix, cgipath));
 		args[2] = NULL;
-
-		close(fd[0]);
-		dup2(fd[1], STDOUT_FILENO);
+	
+		dup2(readfd[1], STDOUT_FILENO);
+		dup2(writefd[0], STDIN_FILENO);
+		close(readfd[1]);
+		close(writefd[0]);
+		close(readfd[0]);
+		close(writefd[1]);
 		if (execve("/usr/bin/python3", args, envs) == -1)
 			exit(127);
     }
 	else
 	{
+	
+		while (!request->getBody().empty())
+		{
+			
+			if (request->getBody().size() > 50000)
+			{
+				write(writefd[1], request->getBody().substr(0, 50000).c_str(), 50000);
+				request->eraseBody(0, 50000);
+			}
+			else
+			{
+				std::cout << "Size === " << request->getBody().size(); 
+				write(writefd[1], request->getBody().c_str(), request->getBody().size());
+				request->eraseBody(0, request->getBody().size());
+			}
+		}
+		close(writefd[1]);
+		close(writefd[0]);
+	
 		waitpid(pid, &status, 0);
 		if (WEXITSTATUS(status) != 0)
 		{	this->status_code = 404;
 			return (insertResponse(responseHeader(404).append(errorPage())));
 		}
-		close(fd[1]);
+		close(readfd[1]);
 		string cgireturn;
-		while(read(fd[0], buf, BUFFER_SIZE) > 0)
+		while(read(readfd[0], buf, BUFFER_SIZE) > 0)
 			cgireturn.append(string(buf));
-		close(fd[0]);
+		close(readfd[0]);
 		if (redirection == true)
 			this->status_code = MOVED_PERMANENTLY;
 		else
@@ -488,8 +513,7 @@ void ft::Response::methodPost(ft::Request *request)
 	
 	if (!request->getBody().empty())
 	{
-		std::cout << "content" << request->getContentType();
-		std::cout << "body" << request->getBody() << std::endl;
+		// std::cout << "body===" << request->getBody() << std::endl;
 		executeCGI(prefix, request);
 		return;
 	}

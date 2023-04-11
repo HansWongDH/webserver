@@ -26,6 +26,7 @@ namespace ft{
 				string getContentType() const;
 			std::map<string, string>	getParams(void);
 			std::pair<const string, string> getCookie(void) const;
+			void	eraseBody(size_t pos, size_t size);
 		private:
 			string	_header;
 			string	_body;

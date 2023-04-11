@@ -22,7 +22,7 @@ namespace ft
 			typedef	ft::Server				server_type;
 			typedef server_type&			server_reference;
 			typedef map<int, ft::Server>	servers_map;
-			typedef map<int, ft::Client>	clients_map;
+			typedef map<int, ft::Client*>	clients_map;
 			typedef map<string, string>		env_map;
 			typedef servers_map::iterator	servers_iterator;
 			typedef servers_map::const_iterator	servers_const_iterator;
@@ -42,7 +42,7 @@ namespace ft
 			int					findServerfd(int client_fd);
 			void				insertClient(int server_id, int client_fd);
 			void				eraseClient(int client_fd);
-			ft::Client			findClient(int client_fd);
+			ft::Client&			findClient(int client_fd);
 			char**				mapToChar(env_map envs);
 			env_map				charToMap(char **env);
 			void				printEnv();
