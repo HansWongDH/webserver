@@ -72,6 +72,7 @@ namespace ft
 			int	executeCGI(string prefix, ft::Request *request);
 			bool	checkCookie(ft::Request *request);
 			string	generateCookie();
+			size_t	maxBodySize();
 	};
 } // namespace ft
 

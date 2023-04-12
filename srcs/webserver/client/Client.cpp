@@ -11,10 +11,8 @@ ft::Client::Client(int server_fd, ft::ServerInfo* info, const map<string,string>
 }
 
 ft::Client::~Client() {
-	// if(this->request)
-	// 	delete request;
-	// if (this->response)
-	// 	delete response;
+	delete request;
+	delete response;
 };
 			
 ft::Request*	ft::Client::getRequest() const {
@@ -31,6 +29,8 @@ bool	ft::Client::responseEmpty()
 void	ft::Client::insertHeader(char *buf, int size)
 {
 	request->insertHeader(string(buf, size));
+	if (request->findCarriage() == true)
+		request->parseHeader();
 }
 
 void	ft::Client::parseRespond()
@@ -42,11 +42,6 @@ void	ft::Client::insertBody(char *buf, int size)
 	request->insertBody(string(buf, size));
 }
 
-void	ft::Client::parseHeader(int size)
-{
-	(void)size;
-	request->parseHeader();
-}
 void	ft::Client::parseBody()
 {
 	request->parseBody();

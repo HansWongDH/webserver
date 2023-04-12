@@ -77,10 +77,7 @@ void ft::Response::parseResponse(ft::Request *request)
 	this->target = pageRedirection(request->getTarget());
 	this->status_code = allowedMethod(request);
 	if (this->status_code != OK)
-	{
 		insertResponse(responseHeader(this->status_code).append(errorPage()));
-		return;
-	}
 	else
 	{
 		if (request->getMethod() == "GET")
@@ -90,7 +87,7 @@ void ft::Response::parseResponse(ft::Request *request)
 		else if (request->getMethod() == "DELETE")
 			methodDelete(request);
 		else
-			return;
+			insertResponse(responseHeader(this->status_code).append(errorPage()));
 	}
 }
 
@@ -212,8 +209,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 
 		while (!request->getBody().empty())
 		{
-			
-			
+			std::cout << request->getBody().length() << std::endl;
 			if (request->getBody().length() > BUFFER_SIZE)
 			{
 				write(writefd[1], request->getBody().substr(0, BUFFER_SIZE).c_str(), BUFFER_SIZE);
@@ -447,8 +443,6 @@ string ft::Response::defaultErrorPage(void)
 
 void ft::Response::methodGet(ft::Request *request)
 {
-	// std::cout << "here" << this->status_code << std::endl;
-	// std::cout << "Target: " << request->getTarget() << std::endl;
 	try
 	{
 		root = info->getConfigInfo("root").front();
@@ -459,27 +453,15 @@ void ft::Response::methodGet(ft::Request *request)
 	std::fstream file;
 	/*exact match*/
 
-	// if (!request->getCookie().first.empty())
-	// 	std::cout << request->getCookie().first << request->getCookie().second << std::endl;
-	// string target = pageRedirection(request->getTarget());
 	file.open(ft::pathAppend(root, target));
 	string prefix = prefererentialPrefixMatch(target);
 	/*if failed, do prefix matching*/
-
 
 	if (!file.is_open())
 	{
 		if (!prefix.empty())
 		{
-			if (!initalizeLocationConfig(prefix, "root").empty())
-				this->root = initalizeLocationConfig(prefix, "root").front();
-			if (!initalizeLocationConfig(prefix, "index").empty())
-				this->index = initalizeLocationConfig(prefix, "index");
-			if (!initalizeLocationConfig(prefix, "autoindex").empty())
-			{
-				if (!initalizeLocationConfig(prefix, "autoindex").front().compare("on"))
-					this->auto_index = true;
-			}
+
 			if (!request->getQuery().empty())
 			{
 				executeCGI(prefix, request);
@@ -513,6 +495,30 @@ void ft::Response::methodGet(ft::Request *request)
 	else
 		insertResponse(responseHeader(this->status_code).append(string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>())));
 }
+
+size_t	ft::Response::maxBodySize()
+{
+	string size;
+	try
+	{
+		size = info->getConfigInfo("client_max_body_size").front();
+	}
+	catch(const std::exception& e)
+	{
+		size = "0";
+		std::cerr << e.what() << '\n';
+	}	
+	switch (size.back())
+	{
+	case 'K':
+		return(std::atoi(size.substr(0, size.size() - 1).c_str()) * 1000);
+	case 'M':
+		return(std::atoi(size.substr(0, size.size() - 1).c_str()) * 1000000);
+	default:
+		return(std::atoi(size.c_str()));
+	}
+}
+
 void ft::Response::methodPost(ft::Request *request)
 {
 	string target = pageRedirection(request->getTarget());
@@ -520,9 +526,13 @@ void ft::Response::methodPost(ft::Request *request)
 	
 	if (!request->getBody().empty())
 	{
-		// std::cout << "body===" << request->getBody() << std::endl;
-		executeCGI(prefix, request);
-		return;
+		if (request->getBody().length() > maxBodySize() && maxBodySize() > 0)
+		{
+			this->status_code = PAYLOAD_TOO_LARGE;
+			insertResponse(responseHeader(this->status_code).append(errorPage()));
+		}
+		else
+			executeCGI(prefix, request);
 	}
 }
 
@@ -663,15 +673,15 @@ void ft::Response::returnResponse(int fd)
 		size -= BUFFER_SIZE;
 		// std::cout << "tmp here" << tmp << "size === " << size << std::endl;
 		_response.erase(0, BUFFER_SIZE);
-		write(fd, tmp.c_str(), BUFFER_SIZE);
-		std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		send(fd, tmp.c_str(), BUFFER_SIZE, 0);
+		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
 	}
 	else
 	{
 		size = 0;
-		write(fd, _response.c_str(), _response.size());
+		send(fd, _response.c_str(), _response.size(), 0);
 		// std::cout << _response << std::endl;
-		std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
 		_response.clear();
 	}
 }
