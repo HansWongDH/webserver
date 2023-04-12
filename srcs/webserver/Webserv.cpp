@@ -22,10 +22,9 @@ void	ft::Webserv::initializePollstruct(void)
 		fds.push_back(tmp);
 	}
 }
-void	ft::Webserv::insertServer(int server_fd, const server_type& server)
+void	ft::Webserv::insertServer(int server_fd, server_type *server)
 {
-	ft::Server *serv = new ft::Server(server);
-	servers.insert(std::make_pair(server_fd, serv));
+	servers.insert(std::make_pair(server_fd, server));
 }
 
 /**
@@ -124,8 +123,7 @@ void	ft::Webserv::runServer(int timeout)
 					{
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in send mode." RESET << endl;
 				
-						clients[fds[i].fd]->getResponse()->returnResponse(fds[i].fd);
-						if (clients[fds[i].fd]->getResponse()->empty())
+						if (clients[fds[i].fd]->getResponse()->returnResponse(fds[i].fd) <= 0)
 							connection = true;
 					}
 					if (fds[i].revents & POLLHUP || connection == true)

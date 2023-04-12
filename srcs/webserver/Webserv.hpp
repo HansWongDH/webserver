@@ -36,7 +36,7 @@ namespace ft
 			Webserv(char **env);
 			~Webserv();
 			Webserv(const Webserv& other);
-			void				insertServer(int server_fd, const server_type& server);
+			void				insertServer(int server_fd, server_type *server);
 			void				insertClient(int server_id, int client_fd);
 			void				eraseClient(int client_fd);
 			env_map				charToMap(char **env);

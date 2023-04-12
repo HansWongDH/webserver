@@ -11,7 +11,7 @@ ft::Response::~Response()
 int ft::Response::insertResponse(string infile)
 {
 	this->_response = infile;
-	this->size = infile.size();
+	this->size += infile.size();
 	return this->size;
 }
 
@@ -76,6 +76,13 @@ void ft::Response::parseResponse(ft::Request *request)
 	this->prefix = prefererentialPrefixMatch(request->getTarget());
 	this->target = pageRedirection(request->getTarget());
 	this->status_code = allowedMethod(request);
+	try
+	{
+		root = info->getConfigInfo("root").front();
+	}
+	catch (const std::exception &e)
+	{
+	}
 	if (this->status_code != OK)
 		insertResponse(responseHeader(this->status_code).append(errorPage()));
 	else
@@ -226,18 +233,12 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	
 		waitpid(pid, &status, 0);
 		if (WEXITSTATUS(status) != 0)
-		{	this->status_code = 404;
-			return (insertResponse(responseHeader(404).append(errorPage())));
-		}
+			return (insertResponse(responseHeader(NOT_FOUND).append(errorPage())));
 		close(readfd[1]);
 		string cgireturn;
 		while(read(readfd[0], buf, BUFFER_SIZE) > 0)
 			cgireturn.append(string(buf));
 		close(readfd[0]);
-		if (redirection == true)
-			this->status_code = MOVED_PERMANENTLY;
-		else
-			this->status_code = OK;
 		return (insertResponse(responseHeader(this->status_code).append(cgireturn)));
 		
 	}
@@ -295,6 +296,7 @@ std::string	ft::Response::generateCookie()
 
 string ft::Response::responseHeader(int status_code)
 {
+	this->status_code = status_code;
 	string ret = "HTTP/1.1" + getStatus(status_code) + "\r\nContent-Type: */*\r\n";
 	if (status_code != OK || cookie == true)
 		return (ret + "\r\n");
@@ -358,6 +360,7 @@ string	ft::Response::pageRedirection(string target)
 			std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
 			string redir = pathAppend(info->getLocationInfo(prefix, "return").front(), target.substr(target.find(prefix) + prefix.length()));
 			redirection = true;
+			this->status_code = MOVED_PERMANENTLY;
 			std::cout << "Redirection exist, redirecting to " << redir << std::endl;
 			return redir;
 		}
@@ -365,6 +368,7 @@ string	ft::Response::pageRedirection(string target)
 	catch(const std::exception& e)
 	{	
 	}
+	this->status_code = OK;
 	return target;
 }
 
@@ -379,9 +383,12 @@ string ft::Response::autoIndexGenerator(string prefix)
 	{
 		while ((ent = readdir(dir)) != NULL)
 		{
-			string file_path = path + ent->d_name;
+			
+			string file_path = pathAppend(path, string(ent->d_name));
+			
 			struct stat sb;
-			stat(file_path.c_str(), &sb);
+			int ret = stat(file_path.c_str(), &sb);
+			std::cout << RED "this size" << ret << "this path" << file_path <<  RESET << std::endl;
 			dir_contents.push_back(std::make_pair(ent->d_name, sb.st_size));
 		}
 		closedir(dir);
@@ -412,7 +419,7 @@ string ft::Response::autoIndexGenerator(string prefix)
 	for (vector<std::pair<string, int> >::const_iterator it = dir_contents.begin(); it != dir_contents.end(); ++it)
 	{
 		response += "<tr>\n";
-		response += "<td><a href=\"" + prefix + "/" + it->first + "\">" + it->first + "</a></td>\n";
+		response += "<td><a href=\"" + pathAppend(prefix, it->first) + "\">" + it->first + "</a></td>\n";
 		response += "<td>" + std::to_string(it->second) + "</td>\n";
 		response += "</tr>\n";
 	}
@@ -443,13 +450,6 @@ string ft::Response::defaultErrorPage(void)
 
 void ft::Response::methodGet(ft::Request *request)
 {
-	try
-	{
-		root = info->getConfigInfo("root").front();
-	}
-	catch (const std::exception &e)
-	{
-	}
 	std::fstream file;
 	/*exact match*/
 
@@ -461,7 +461,15 @@ void ft::Response::methodGet(ft::Request *request)
 	{
 		if (!prefix.empty())
 		{
-
+			if (!initalizeLocationConfig(prefix, "root").empty())
+				this->root = initalizeLocationConfig(prefix, "root").front();
+			if (!initalizeLocationConfig(prefix, "index").empty())
+				this->index = initalizeLocationConfig(prefix, "index");
+			if (!initalizeLocationConfig(prefix, "autoindex").empty())
+			{
+				if (!initalizeLocationConfig(prefix, "autoindex").front().compare("on"))
+					this->auto_index = true;
+			}
 			if (!request->getQuery().empty())
 			{
 				executeCGI(prefix, request);
@@ -471,26 +479,14 @@ void ft::Response::methodGet(ft::Request *request)
 				file.open(ft::pathAppend(root, prefix, index.front()));
 			else
 				file.open(ft::pathAppend(root, prefix, index.back()));
-			if (file.is_open())
-			{
-				if (redirection == false)
-					this->status_code = OK;
-				else
-					this->status_code = MOVED_PERMANENTLY;
-			}
 		}
-		else
-			this->status_code = NOT_FOUND;
 	}
-	// std::cout << "current status code" << this->status_code << std::endl;
 	if (!file.is_open())
-		this->status_code = NOT_FOUND;
-	if (this->status_code != OK)
 	{
 		if (this->auto_index == true)
 			insertResponse(responseHeader(this->status_code).append(autoIndexGenerator(prefix)));
 		else
-			insertResponse(responseHeader(this->status_code).append(errorPage()));
+			insertResponse(responseHeader(NOT_FOUND).append(errorPage()));
 	}
 	else
 		insertResponse(responseHeader(this->status_code).append(string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>())));
@@ -622,28 +618,17 @@ int delete_directory(const std::string &path)
 
 void ft::Response::methodDelete(ft::Request *request)
 {
-	std::cout << "Target: " << request->getTarget() << std::endl;
-	try
-	{
-		root = info->getConfigInfo("root").front();
-	}
-	catch (const std::exception &e)
-	{
-	}
-
-	// Ensure we dont allow someone to delete the root directory or go above & also check if file exists
+	(void)request;
 	std::string request_path = root + target;
 	if (!isSubdirectory(request_path.c_str()) || access(request_path.c_str(), F_OK))
 	{
-		this->status_code = NOT_FOUND;
-		insertResponse(responseHeader(this->status_code).append("Not Found!"));
+		insertResponse(responseHeader(NOT_FOUND).append("Not Found!"));
 		return;
 	}
 	int result = remove(request_path.c_str());
 
 	if (result == 0)
 	{
-		this->status_code = OK;
 		insertResponse(responseHeader(this->status_code).append("Deleted!"));
 	}
 	else
@@ -665,25 +650,23 @@ void ft::Response::methodDelete(ft::Request *request)
 	}
 }
 
-void ft::Response::returnResponse(int fd)
+int ft::Response::returnResponse(int fd)
 {
+	int ret;
 	if (this->size > BUFFER_SIZE)
 	{
 		string tmp = _response.substr(0, BUFFER_SIZE);
 		size -= BUFFER_SIZE;
-		// std::cout << "tmp here" << tmp << "size === " << size << std::endl;
 		_response.erase(0, BUFFER_SIZE);
-		send(fd, tmp.c_str(), BUFFER_SIZE, 0);
-		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		ret = send(fd, tmp.c_str(), BUFFER_SIZE, 0);
 	}
 	else
 	{
 		size = 0;
-		send(fd, _response.c_str(), _response.size(), 0);
-		// std::cout << _response << std::endl;
-		// std::cout << "CURRENT SIZE === " << this->size << std::endl;
+		ret = send(fd, _response.c_str(), _response.size(), 0);
 		_response.clear();
 	}
+	return ret;
 }
 
 bool ft::Response::empty()

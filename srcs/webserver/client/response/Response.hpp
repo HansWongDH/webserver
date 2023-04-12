@@ -38,14 +38,13 @@ namespace ft
 			Response(ft::ServerInfo* info, const map<string,string>& env);
 			~Response();
 
-			int	insertResponse(string infile);
+			int		insertResponse(string infile);
 			void	parseResponse(ft::Request *request);
 			void	methodGet(ft::Request *request);
 			void	methodPost(ft::Request *request);
 			void	methodDelete(ft::Request *request);
-			void	returnResponse(int fd);
+			int		returnResponse(int fd);
 			string	responseHeader(int status_code);
-			string 	fileOpen(ft::Request *request);
 			bool	empty();
 
 		private:

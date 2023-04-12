@@ -25,7 +25,7 @@ namespace ft
             typedef value_type::iterator			value_iterator;
 
             Server();
-            Server(int port, ft::ServerInfo serv);
+            Server(int port, const ft::ServerInfo &serv);
             ~Server();
             Server(const Server& other);
 
