@@ -21,23 +21,23 @@ import sys
 
 
 # try:
-body = []
-for line in sys.stdin:
-    print(line)
-    body.append(line)
+# body = []
+# for line in sys.stdin:
+#     print(line)
+#     body.append(line)
 
-boundary = body[0][:-2]
-file_name = body[1][body[1].rfind('=') + 2:-3]
-body_found = False
-for line in body:
-    if body_found:
-        if boundary in line:
-            new_file.close()
-        elif boundary not in line:
-            new_file.write(line.encode("utf-8", "surrogateescape"))
-    elif line == "\r\n":
-        new_file = open(file_name, 'wb')
-        body_found = True
+# boundary = body[0][:-2]
+# file_name = body[1][body[1].rfind('=') + 2:-3]
+# body_found = False
+# for line in body:
+#     if body_found:
+#         if boundary in line:
+#             new_file.close()
+#         elif boundary not in line:
+#             new_file.write(line.encode("utf-8", "surrogateescape"))
+#     elif line == "\r\n":
+#         new_file = open(file_name, 'wb')
+#         body_found = True
 # except:
 #     pass
 # Split the body string into parts using the boundary string
@@ -139,3 +139,37 @@ for line in body:
 #         chunk = process_body_chunk(chunk, new_file)
 #         if boundary + b"--" in chunk:
 #             break
+
+import sys
+
+def find_boundary_end(boundary, body):
+    for i in range(len(body)):
+        if body[i:i+len(boundary)+2] == boundary + b'--':
+            return i
+    return -1
+
+body = b''
+length = 0
+while True:
+    data = sys.stdin.buffer.read(int(os.environ["SIZE"]))
+    if not data:
+        break
+    body += data
+    length += len(data)
+
+print("Received length:", len(body), file=sys.stderr)
+
+body_lines = body.split(b'\r\n')
+boundary = body_lines[0]
+file_name = body_lines[1][body_lines[1].rfind(b'=') + 2:-1]
+
+boundary_end_pos = find_boundary_end(boundary, body)
+print("Found boundary end", boundary_end_pos, file=sys.stderr)
+if boundary_end_pos == -1:
+    raise ValueError("Boundary not found")
+
+body_content = body[len(boundary)+2:boundary_end_pos].split(b'\r\n')[2:]
+with open(file_name.decode('utf-8'), 'wb') as new_file:
+    for line in body_content:
+        new_file.write(line)
+

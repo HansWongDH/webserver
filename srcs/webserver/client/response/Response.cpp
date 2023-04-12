@@ -212,7 +212,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 
 		while (!request->getBody().empty())
 		{
-				std::cout << "Size === " << request->getRawbytes() << std::endl;
+			std::cout << "Size === " << request->getRawbytes() << std::endl;
 			
 			if (request->getRawbytes() > BUFFER_SIZE)
 			{
