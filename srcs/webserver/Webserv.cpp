@@ -1,13 +1,15 @@
 #include "Webserv.hpp"
 
 ft::Webserv::Webserv() : servers(), clients() {}
-ft::Webserv::~Webserv(){}
+ft::Webserv::~Webserv(){
+	for (servers_iterator it = servers.begin(); it != servers.end(); it++)
+		delete it->second;
+}
 ft::Webserv::Webserv(char **env) : servers(), clients() {
 	this->envs = charToMap(env);
 }
 ft::Webserv::Webserv( const Webserv& other) : servers(other.servers), clients(other.clients), envs(other.envs)
 {
-
 }
 
 void	ft::Webserv::initializePollstruct(void)
@@ -15,15 +17,15 @@ void	ft::Webserv::initializePollstruct(void)
 	for (servers_iterator it = servers.begin(); it != servers.end(); it++)
 	{
 		struct pollfd tmp;
-		tmp.fd = it->second.getFd();
+		tmp.fd = it->second->getFd();
 		tmp.events = POLLIN;
 		fds.push_back(tmp);
 	}
 }
 void	ft::Webserv::insertServer(int server_fd, const server_type& server)
 {
-	// ft::Server *serv = new ft::Server(server);
-	servers.insert(std::make_pair(server_fd, server));
+	ft::Server *serv = new ft::Server(server);
+	servers.insert(std::make_pair(server_fd, serv));
 }
 
 /**
@@ -41,7 +43,7 @@ void	ft::Webserv::insertServer(int server_fd, const server_type& server)
 
 void	ft::Webserv::insertClient(int server_id, int client_fd)
 {
-	ft::Client *tmp = new ft::Client(server_id, servers[server_id].getInfoAddress(), envs);
+	ft::Client *tmp = new ft::Client(server_id, servers[server_id]->getInfoAddress(), envs);
 	
 	clients.insert(std::make_pair(client_fd, tmp));
 }
@@ -84,7 +86,7 @@ void	ft::Webserv::runServer(int timeout)
 					if (fds[i].revents & POLLIN)
 					{
 						struct pollfd tmp;
-						tmp.fd = servers[fds[i].fd].getSocket().accept_connection();
+						tmp.fd = servers[fds[i].fd]->getSocket().accept_connection();
 						insertClient(fds[i].fd, tmp.fd);
 						tmp.events = POLLIN;
 						cout << CYAN "[INFO] Incoming connection connected to FD: " << fds[i].fd << " with client FD: " << tmp.fd <<  RESET << endl;

@@ -35,7 +35,7 @@ void	ft::Parser::readfile(ifstream &file)
 		{
 			searchServer(file, store);
 			this->conf.push_back(store);
-			store.clear();
+			store->clear();
 		}
 		key.clear();
 		value.clear();
@@ -71,7 +71,7 @@ void	ft::Parser::searchServer(ifstream& file, value_type& store)
 				while (ss2 >> value)
 					block.push_back(value);
 				endoflineCheck(block);
-				store.addConfig(key, block);
+				store->addConfig(key, block);
 				block.clear();
 			}
 		}
@@ -102,12 +102,12 @@ void	ft::Parser::searchLocation(ifstream& file, value_type& store, string map_ke
 		block.clear();
 		key.clear();
 	}
-	store.addLocation(map_key, config);
+	store->addLocation(map_key, config);
 }
 
 void	ft::Parser::checkPort(value_type config)
 {
-	string_type port = config.getConfigInfo("listen");
+	string_type port = config->getConfigInfo("listen");
 	if (port.size() < 1)
 		throw std::out_of_range("Listen port not initalized");
 	if (port.size() != 1)

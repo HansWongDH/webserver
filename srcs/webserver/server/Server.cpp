@@ -6,7 +6,8 @@ ft::Server::Server(int port, ft::ServerInfo serv): socket(port), info(new ft::Se
 }
             
 ft::Server::~Server() {
-    // close(client_fd);
+    std::cout << RED << "server destructor called" << std::endl;
+    delete info;
 }
 
 ft::Server::Server(const Server& other)

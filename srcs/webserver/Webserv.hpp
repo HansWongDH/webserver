@@ -24,7 +24,7 @@ namespace ft
 			typedef ft::Client				client_type;
 			typedef	ft::Server				server_type;
 			typedef server_type&			server_reference;
-			typedef map<int, ft::Server>	servers_map;
+			typedef map<int, ft::Server*>	servers_map;
 			typedef map<int, ft::Client*>	clients_map;
 			typedef map<string, string>		env_map;
 			typedef vector<pollfd>			poll_vector;

@@ -18,7 +18,7 @@ namespace ft
 {
 	class Parser {
 		public:
-			typedef ft::ServerInfo					value_type;
+			typedef ft::ServerInfo*					value_type;
 			typedef	ft::ServerInfo::value_type		string_type;
 			typedef	string_type::iterator			string_iterator;
 			typedef ft::Server						server_type;
