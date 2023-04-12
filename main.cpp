@@ -100,7 +100,7 @@ int main(int ac, char **av, char **env)
 								std::cout << RED "Here 3" RESET<< endl;
 								WebServer.findClient(fds[i].fd).insertBody(buf,ret);
 							}
-							std::cout << "Content length == " << WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() << std::endl;
+							std::cout << "Content length == " << WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() << "raw_bytes ===" << WebServer.findClient(fds[i].fd).getRequest()->getRawbytes() << std::endl;
 							if (WebServer.findClient(fds[i].fd).getRequest()->getcontentLength() == WebServer.findClient(fds[i].fd).getRequest()->getRawbytes())
 							{
 								WebServer.findClient(fds[i].fd).parseRespond();

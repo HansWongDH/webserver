@@ -14,8 +14,8 @@ namespace ft{
 			
 			void	parseHeader();
 			void	parseBody();
-			void	insertHeader(const string& raw_request, int size);
-			void	insertBody(const string& raw_request, int size);
+			void	insertHeader(const string& raw_request);
+			void	insertBody(const string& raw_request);
 			int	findCarriage(void) const;
 			string	getTarget(void) const;
 			string	getPrefix(void) const;

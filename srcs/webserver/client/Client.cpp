@@ -30,7 +30,7 @@ bool	ft::Client::responseEmpty()
 }
 void	ft::Client::insertHeader(char *buf, int size)
 {
-	request->insertHeader(string(buf, size), size);
+	request->insertHeader(string(buf, size));
 }
 
 void	ft::Client::parseRespond()
@@ -39,7 +39,7 @@ void	ft::Client::parseRespond()
 }
 void	ft::Client::insertBody(char *buf, int size)
 {
-	request->insertBody(string(buf, size), size);
+	request->insertBody(string(buf, size));
 }
 
 void	ft::Client::parseHeader(int size)

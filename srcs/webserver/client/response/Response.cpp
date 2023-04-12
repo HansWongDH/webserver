@@ -212,13 +212,12 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 
 		while (!request->getBody().empty())
 		{
-			std::cout << "Size === " << request->getRawbytes() << std::endl;
 			
-			if (request->getRawbytes() > BUFFER_SIZE)
+			
+			if (request->getBody().length() > BUFFER_SIZE)
 			{
 				write(writefd[1], request->getBody().substr(0, BUFFER_SIZE).c_str(), BUFFER_SIZE);
-				request->setRawbytes(request->getRawbytes() - BUFFER_SIZE);
-				request->getBody() = request->getBody().substr(BUFFER_SIZE);
+				request->eraseBody(0, BUFFER_SIZE);
 			}
 			else
 			{
