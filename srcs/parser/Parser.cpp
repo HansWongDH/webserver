@@ -132,15 +132,15 @@ void	ft::Parser::endoflineCheck(string_type& config)
 
 void	ft::Parser::initalizeServer(int port, value_type block)
 {
-	server_type server(port, block);
-	this->servers.insertServer(server.getFd(), server);
+	server_type *server = new server_type(port, block);
+	this->servers.insertServer(server->getFd(), server);
 }
 
 void	ft::Parser::errorChecking(void)
 {
 	for (value_iterator it = conf.begin(); it != conf.end(); it++)
 	{
-		// it->printConfig();
+		it->printConfig();
 		checkPort(*it);
 
 		initalizeServer(it->getPortNo(), *it);
