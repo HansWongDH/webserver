@@ -9,13 +9,18 @@
 using std::cout;
 using std::endl;
 using std::vector;
+using std::string;
 
 int main(int ac, char **av, char **env)
 {	
-	
 	if (ac != 2)
 	{
 		throw std::invalid_argument("Too many arguments");
+	}
+	string filename (av[1]);
+	if (filename.substr(filename.find(".")).compare(".conf"))
+	{
+		throw std::invalid_argument("Invalid file type");
 	}
 	std::ifstream file;
 	file.open(av[1]);
@@ -25,8 +30,6 @@ int main(int ac, char **av, char **env)
 	std::vector<std::string> test(temp, temp + 6);
 	ft::Parser parsed(file, test, env);
 	ft::Webserv	WebServer(parsed.getWebserv());
-	// for (ft::Webserv::servers_iterator it = WebServer.begin(); it != WebServer.end(); it++)
-	// 	 std::cout << i++ << std::endl;
 	WebServer.initializePollstruct();
 	WebServer.runServer(1000);
 	

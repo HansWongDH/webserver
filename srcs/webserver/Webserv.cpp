@@ -100,14 +100,15 @@ void	ft::Webserv::runServer(int timeout)
 						char *buf = (char *)calloc(sizeof(char), BUFFER_SIZE + 1);
 						int ret;
 						ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
-						cout << "return value of recv :" << ret << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
+						std::cout << BLUE << buf << RESET << std::endl;
+						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 						if (ret > 0)
 						{
 							if (clients[fds[i].fd]->getRequest()->getcontentLength() == -1)
 								clients[fds[i].fd]->insertHeader(buf,ret);
 							else
 								clients[fds[i].fd]->insertBody(buf,ret);
-							std::cout << "Content length == " << clients[fds[i].fd]->getRequest()->getcontentLength() << "raw_bytes ===" << clients[fds[i].fd]->getRequest()->getRawbytes() << std::endl;
+							// std::cout << "Content length == " << clients[fds[i].fd]->getRequest()->getcontentLength() << "raw_bytes ===" << clients[fds[i].fd]->getRequest()->getRawbytes() << std::endl;
 							if (clients[fds[i].fd]->getRequest()->getcontentLength() == clients[fds[i].fd]->getRequest()->getRawbytes())
 							{
 								clients[fds[i].fd]->parseRespond();
@@ -128,7 +129,7 @@ void	ft::Webserv::runServer(int timeout)
 					}
 					if (fds[i].revents & POLLHUP || connection == true)
 					{
-						cout << RED "Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
+						cout << RED "[INFO] Deleteing client FD: " << fds[i].fd << " connnected to server FD: "
 						<< clients[fds[i].fd]->server_fd <<  RESET <<  endl;
 						eraseClient(fds[i].fd);
 						fds.erase(fds.begin() + i);

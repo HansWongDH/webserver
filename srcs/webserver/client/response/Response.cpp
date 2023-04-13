@@ -33,14 +33,14 @@ vector<string> ft::Response::initalizeLocationConfig(string prefix, string value
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << value << " is not specified in " << prefix << " initalized with server config" << '\n';
+		std::cerr << BLUE "[DBUG] " << value << " is not specified in [" << prefix << "] , initialized with server config" << '\n';
 		try
 		{
 			ret = info->getConfigInfo(value);
 		}
 		catch (const std::exception &e)
 		{
-			std::cerr << value << " is not specified in server, initalized with default config" << '\n';
+			std::cerr << RED "[DBUG] "<< value << " is not specified in server config, initialized with default config" << '\n';
 		}
 	}
 	return ret;
@@ -83,7 +83,8 @@ void ft::Response::parseResponse(ft::Request *request)
 	catch (const std::exception &e)
 	{
 	}
-	if (this->status_code != OK)
+	// std::cout << "CURRENTLY THE TARGET IS " << prefix<<  "Request method is " << request->getMethod()<< std::endl;
+	if (this->status_code != OK && this->status_code != MOVED_PERMANENTLY)
 		insertResponse(responseHeader(this->status_code).append(errorPage()));
 	else
 	{
@@ -122,14 +123,6 @@ string getStatus(int status_code)
 }
 
 
-void	dynamicFree(char **argument)
-{
-	for (int i = 0; argument[i] != NULL; i++)
-	{
-		std::cout << argument[i] <<std::endl;
-		delete	argument[i];
-	}
-}
 
 char*	dynamicDup(string s)
 {
@@ -202,9 +195,9 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
 	
 		dup2(readfd[1], STDOUT_FILENO);
 		dup2(writefd[0], STDIN_FILENO);
+		close(readfd[0]);
 		close(readfd[1]);
 		close(writefd[0]);
-		close(readfd[0]);
 		close(writefd[1]);
 		chdir(pathAppend(root, prefix).c_str());
 		if (execve("/usr/bin/python3", args, envs) == -1)
@@ -212,7 +205,7 @@ int	ft::Response::executeCGI(string prefix, ft::Request *request)
     }
 	else
 	{
-		std::cout << pathAppend(root, prefix) << std::endl;
+		// std::cout << pathAppend(root, prefix) << std::endl;
 
 		while (!request->getBody().empty())
 		{
@@ -325,7 +318,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 	{
 		// std::cout << " I enter here w/ url ==== " << url << std::endl;
 		if (!url.find_last_of('/'))
-			return ("");
+			return ("/");
 		else
 			return prefererentialPrefixMatch(url.substr(0, url.find_last_of('/')));
 	}
@@ -357,11 +350,11 @@ string	ft::Response::pageRedirection(string target)
 	{
 		if (!info->getLocationInfo(prefix, "return").empty())
 		{
-			std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
+			// std::cout << BLUE "redirection prefix " << prefix << "redirection substr =" << target.substr(target.find(prefix) + prefix.length()) << RESET << std::endl;
 			string redir = pathAppend(info->getLocationInfo(prefix, "return").front(), target.substr(target.find(prefix) + prefix.length()));
 			redirection = true;
 			this->status_code = MOVED_PERMANENTLY;
-			std::cout << "Redirection exist, redirecting to " << redir << std::endl;
+			std::cout << CYAN "[INFO] Redirection exist, redirecting to " << redir << RESET << std::endl;
 			return redir;
 		}
 	}
@@ -387,8 +380,8 @@ string ft::Response::autoIndexGenerator(string prefix)
 			string file_path = pathAppend(path, string(ent->d_name));
 			
 			struct stat sb;
-			int ret = stat(file_path.c_str(), &sb);
-			std::cout << RED "this size" << ret << "this path" << file_path <<  RESET << std::endl;
+			stat(file_path.c_str(), &sb);
+			// std::cout << RED "this size" << ret << "this path" << file_path <<  RESET << std::endl;
 			dir_contents.push_back(std::make_pair(ent->d_name, sb.st_size));
 		}
 		closedir(dir);
@@ -450,10 +443,13 @@ string ft::Response::defaultErrorPage(void)
 
 void ft::Response::methodGet(ft::Request *request)
 {
+	std::cout << RED "File opened at " << pathAppend(root, target) << RESET << std::endl;
 	std::fstream file;
 	/*exact match*/
-
+		
 	file.open(ft::pathAppend(root, target));
+	// if (file.is_open())
+
 	string prefix = prefererentialPrefixMatch(target);
 	/*if failed, do prefix matching*/
 

@@ -23,12 +23,11 @@ namespace ft{
 			string	getQuery(void) const;
 			string	getBody(void) const;
 			int		getcontentLength(void) const;
-				string getContentType() const;
+			string getContentType() const;
 			std::map<string, string>	getParams(void);
 			std::pair<const string, string> getCookie(void) const;
 			void	eraseBody(size_t pos, size_t size);
 			int		getRawbytes();
-			void	setRawbytes(int size);
 		private:
 			string	_header;
 			string	_body;

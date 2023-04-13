@@ -1,18 +1,18 @@
-
-<!DOCTYPE html>
 <html>
-  <head>
-    <title>Sample HTML Page</title>
-  </head>
-  <body>
-    <h1>Welcome to my Sample HTML Page!</h1>
-    <p>This is a paragraph of text.</p>
-    <form>
-      <label for="fname">First name:</label><br>
-      <input type="text" id="fname" name="fname"><br>
-      <label for="lname">Last name:</label><br>
-      <input type="text" id="lname" name="lname">
-    </form>
-  </body>
-</html>
+<script type="text/javascript">
+  function streamUpload() {
+    var blob = new Blob(['GmnQPBU+nyRGER4JPAW4DjDQC19D']);
+    var xhr = new XMLHttpRequest();
+    // Add any event handlers here...
+    xhr.open('POST', '/upload', true);
+    xhr.setRequestHeader("Transfer-Encoding", "chunked");
+    xhr.send(blob);
+  }
+</script>
 
+<body>
+  <div id='demo'>Test Chunked Upload using XHR</div>
+  <button onclick="streamUpload()">Start Upload</button>
+</body>
+
+</html>
