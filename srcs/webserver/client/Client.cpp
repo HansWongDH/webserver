@@ -30,7 +30,10 @@ void	ft::Client::insertHeader(char *buf, int size)
 {
 	request->insertHeader(string(buf, size));
 	if (request->findCarriage() == true)
+	{
+		std::cout << "header found" <<std::endl;
 		request->parseHeader();
+	}
 }
 
 void	ft::Client::parseRespond()

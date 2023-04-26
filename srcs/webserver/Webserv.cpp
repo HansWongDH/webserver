@@ -100,7 +100,7 @@ void	ft::Webserv::runServer(int timeout)
 						char *buf = (char *)calloc(sizeof(char), BUFFER_SIZE + 1);
 						int ret;
 						ret = recv(fds[i].fd, buf, BUFFER_SIZE, 0);
-						std::cout << BLUE << buf << RESET << std::endl;
+						std::cout << ret << "===" BLUE << buf << RESET << std::endl;
 						cout << MAGENTA "[INFO] Client FD : " << fds[i].fd << " is in read mode." RESET << endl;
 						if (ret > 0)
 						{
@@ -108,8 +108,9 @@ void	ft::Webserv::runServer(int timeout)
 								clients[fds[i].fd]->insertHeader(buf,ret);
 							else
 								clients[fds[i].fd]->insertBody(buf,ret);
+							
 							// std::cout << "Content length == " << clients[fds[i].fd]->getRequest()->getcontentLength() << "raw_bytes ===" << clients[fds[i].fd]->getRequest()->getRawbytes() << std::endl;
-							if (clients[fds[i].fd]->getRequest()->getcontentLength() == clients[fds[i].fd]->getRequest()->getRawbytes())
+							if (clients[fds[i].fd]->getRequest()->body_end == true)
 							{
 								clients[fds[i].fd]->parseRespond();
 								fds[i].events = POLLOUT;

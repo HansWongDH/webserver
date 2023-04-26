@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-ft::Request::Request() : content_length(-1), raw_bytes(0) {};
+ft::Request::Request() : body_end(true), _header(), _body(), content_length(-1), raw_bytes(0), chunk(false) {};
 ft::Request::~Request() {};
 
 // ft::Request::Request(string	header) : query_string(), body_string() {
@@ -9,7 +9,9 @@ ft::Request::~Request() {};
 
 void	ft::Request::insertHeader(const string& raw_request)
 {
+		
 	this->_header.append(raw_request);
+	
 }
 
 
@@ -23,8 +25,12 @@ int	ft::Request::getRawbytes()
 void	ft::Request::insertBody(const string& raw_request)
 {
 	this->_body.append(raw_request);
-	this->raw_bytes += raw_request.length();
-	
+	if ( _body.length() == content_length || (chunk == true && _body.find("\r\n0\r\n") != string::npos))
+	{
+		std::cout << "body found" << std::endl;
+		body_end = true;
+		parseBody();
+	}
 }
 
 
@@ -191,93 +197,154 @@ void	ft::Request::parseHeader() {
 	{
 		std::stringstream ss(headers.find("Content-Length")->second);
 		ss >> this->content_length;
+		body_end = false;
 	}
+	else if (headers.find("Transfer-Encoding") != headers.end() &&
+		headers["Transfer-Encoding"] == "chunked")
+		{
+			// std::cout <<  "hello" << std::endl;
+			this->content_length = 0;
+			body_end = false;
+			chunk = true;
+		}
 	else
 	 	this->content_length = 0;
 	raw_bytes = raw_request.length() - (raw_request.find("\r\n\r\n") + 4);
-	this->_body = raw_request.substr(raw_request.find("\r\n\r\n") + 4);
-	
+	insertBody(raw_request.substr(raw_request.find("\r\n\r\n") + 4));
+	// std::cout << this->_body << std::endl;
+}
+string	urlDecode(string url)
+{
+	while (url.find("%20") != string::npos)
+		url.replace(url.find("%20"), 3, " ");
+	while (url.find("%24") != string::npos)
+		url.replace(url.find("%24"), 3, "$");
+	while (url.find("%26") != string::npos)
+		url.replace(url.find("%26"), 3, "&");
+	while (url.find("%0A") != string::npos)
+		url.replace(url.find("%0A"), 3, "\n");
+	while (url.find("%2B") != string::npos)
+		url.replace(url.find("%2B"), 3, "+");
+	while (url.find("%2C") != string::npos)
+		url.replace(url.find("%2C"), 3, ",");
+	while (url.find("%3A") != string::npos)
+		url.replace(url.find("%3A"), 3, ":");
+	while (url.find("%3B") != string::npos)
+		url.replace(url.find("%3B"), 3, ";");
+	while (url.find("%3D") != string::npos)
+		url.replace(url.find("%3D"), 3, "=");
+	while (url.find("%3F") != string::npos)
+		url.replace(url.find("%3F"), 3, "?");
+	while (url.find("%40") != string::npos)
+		url.replace(url.find("%40"), 3, "@");
+	return url;
 }
 
 void	ft::Request::parseBody()
 {
-	// Find start of body
+	if (chunk == true)
+	{
+		string temp;
+		// Read and reassemble chunks
+		size_t chunk_start = 0;
+		size_t chunk_end = 0;
+		size_t chunk_size = 0;
 
-    // Parse body, if any
-	if (!this->_body.empty()) {
-		body_string = spaceConversion(this->_body);
-		std::string body_str = this->_body;
-		if (headers.find("Content-Type") != headers.end() &&
-			headers["Content-Type"] == "application/x-www-form-urlencoded") {
+		while (true)
+		{
+			chunk_end = _body.find("\r\n", chunk_start);
+			std::istringstream iss(_body.substr(chunk_start, chunk_end - chunk_start));
+			iss >> std::hex >> chunk_size;
 
-			std::istringstream body_iss(body_str);
-			std::string key_value_pair;
-			while (std::getline(body_iss, key_value_pair, '&')) {
-				size_t equals_sign = key_value_pair.find('=');
-				if (equals_sign != std::string::npos) {
-					std::string key = key_value_pair.substr(0, equals_sign);
-					std::string value = key_value_pair.substr(equals_sign + 1);
-					body[key] = spaceConversion(value);
-				}
-			}
-			body_string = spaceConversion(body_str);
-		} else if (headers["Content-Type"] == "application/json") {
-			// Parse JSON data in body
-			try {
-				std::istringstream iss(body_str);
-				std::stringstream ss;
-				ss << iss.rdbuf();
+			if (chunk_size == 0) 
+				break;
 
-				std::string json_str = ss.str();
-				size_t pos = 0;
-				std::string key, value;
-
-				// Parse key-value pairs from JSON string
-				while (pos < json_str.size()) {
-					// Find next key
-					pos = json_str.find('"', pos);
-					if (pos == std::string::npos) {
-						break;
-					}
-					size_t end_pos = json_str.find('"', pos + 1);
-					if (end_pos == std::string::npos) {
-						break;
-					}
-					key = json_str.substr(pos + 1, end_pos - pos - 1);
-
-					// Find next value
-					pos = json_str.find(':', end_pos);
-					if (pos == std::string::npos) {
-						break;
-					}
-					size_t next_pos = json_str.find_first_of(",\n", pos + 1);
-					if (next_pos == std::string::npos) {
-						next_pos = json_str.size() - 1;
-					}
-					value = json_str.substr(pos + 1, next_pos - pos - 1);
-
-					// Remove leading space
-					if (value[0] == ' ')
-						value = value.substr(1);
-
-					// Remove quotes around value if present
-					if (value[0] == '"' && value[value.size() - 1] == '"') {
-						value = value.substr(1, value.size() - 2);
-					}
-
-					// Insert key-value pair into body map
-					body[key] = value;
-					pos = next_pos + 1;
-					if (body_string.length() > 0)
-						body_string += "&";
-					body_string += key + "=" + value;
-				}
-			} catch (...) {
-				throw std::runtime_error("Failed to parse JSON data");
-			}
+			chunk_start = chunk_end + 2;
+			temp += urlDecode(_body.substr(chunk_start, chunk_size));
+			chunk_start += chunk_size + 2;
 		}
+		_body = temp;
 	}
 }
+// void	ft::Request::parseBody()
+// {
+// 	// Find start of body
+
+//     // Parse body, if any
+// 	if (!this->_body.empty()) {
+// 		body_string = spaceConversion(this->_body);
+// 		std::string body_str = this->_body;
+// 		if (headers.find("Content-Type") != headers.end() &&
+// 			headers["Content-Type"] == "application/x-www-form-urlencoded") {
+
+// 			std::istringstream body_iss(body_str);
+// 			std::string key_value_pair;
+// 			while (std::getline(body_iss, key_value_pair, '&')) {
+// 				size_t equals_sign = key_value_pair.find('=');
+// 				if (equals_sign != std::string::npos) {
+// 					std::string key = key_value_pair.substr(0, equals_sign);
+// 					std::string value = key_value_pair.substr(equals_sign + 1);
+// 					body[key] = spaceConversion(value);
+// 				}
+// 			}
+// 			body_string = spaceConversion(body_str);
+// 		} else if (headers["Content-Type"] == "application/json") {
+// 			// Parse JSON data in body
+// 			try {
+// 				std::istringstream iss(body_str);
+// 				std::stringstream ss;
+// 				ss << iss.rdbuf();
+
+// 				std::string json_str = ss.str();
+// 				size_t pos = 0;
+// 				std::string key, value;
+
+// 				// Parse key-value pairs from JSON string
+// 				while (pos < json_str.size()) {
+// 					// Find next key
+// 					pos = json_str.find('"', pos);
+// 					if (pos == std::string::npos) {
+// 						break;
+// 					}
+// 					size_t end_pos = json_str.find('"', pos + 1);
+// 					if (end_pos == std::string::npos) {
+// 						break;
+// 					}
+// 					key = json_str.substr(pos + 1, end_pos - pos - 1);
+
+// 					// Find next value
+// 					pos = json_str.find(':', end_pos);
+// 					if (pos == std::string::npos) {
+// 						break;
+// 					}
+// 					size_t next_pos = json_str.find_first_of(",\n", pos + 1);
+// 					if (next_pos == std::string::npos) {
+// 						next_pos = json_str.size() - 1;
+// 					}
+// 					value = json_str.substr(pos + 1, next_pos - pos - 1);
+
+// 					// Remove leading space
+// 					if (value[0] == ' ')
+// 						value = value.substr(1);
+
+// 					// Remove quotes around value if present
+// 					if (value[0] == '"' && value[value.size() - 1] == '"') {
+// 						value = value.substr(1, value.size() - 2);
+// 					}
+
+// 					// Insert key-value pair into body map
+// 					body[key] = value;
+// 					pos = next_pos + 1;
+// 					if (body_string.length() > 0)
+// 						body_string += "&";
+// 					body_string += key + "=" + value;
+// 				}
+// 			} catch (...) {
+// 				throw std::runtime_error("Failed to parse JSON data");
+// 			}
+// 		}
+// 	}
+// }
 std::string ft::Request::getContentType (void) const
 {
 	return this->contentType;

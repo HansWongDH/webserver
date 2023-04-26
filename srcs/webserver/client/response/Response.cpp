@@ -76,6 +76,7 @@ void ft::Response::parseResponse(ft::Request *request)
 	this->prefix = prefererentialPrefixMatch(request->getTarget());
 	this->target = pageRedirection(request->getTarget());
 	this->status_code = allowedMethod(request);
+
 	try
 	{
 		root = info->getConfigInfo("root").front();
@@ -317,7 +318,7 @@ string ft::Response::prefererentialPrefixMatch(string url)
 	else
 	{
 		// std::cout << " I enter here w/ url ==== " << url << std::endl;
-		if (!url.find_last_of('/'))
+		if (url.find_last_of('/') == string::npos)
 			return ("/");
 		else
 			return prefererentialPrefixMatch(url.substr(0, url.find_last_of('/')));

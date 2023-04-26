@@ -28,6 +28,7 @@ namespace ft{
 			std::pair<const string, string> getCookie(void) const;
 			void	eraseBody(size_t pos, size_t size);
 			int		getRawbytes();
+			bool	body_end;
 		private:
 			string	_header;
 			string	_body;
@@ -38,8 +39,10 @@ namespace ft{
 			string	contentType;
 			string	query_string;
 			string	body_string;
-			int		content_length;
+			size_t		content_length;
 			int		raw_bytes;
+			bool	chunk;
+			
 		
 			std::map<string, string> headers;
 			std::map<string, string> body;
