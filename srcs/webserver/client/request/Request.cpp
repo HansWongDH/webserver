@@ -27,7 +27,7 @@ void	ft::Request::insertBody(const string& raw_request)
 	this->_body.append(raw_request);
 	if ( _body.length() == content_length || (chunk == true && _body.find("\r\n0\r\n") != string::npos))
 	{
-		std::cout << "body found" << std::endl;
+		// std::cout << "body found" << std::endl;
 		body_end = true;
 		parseBody();
 	}
